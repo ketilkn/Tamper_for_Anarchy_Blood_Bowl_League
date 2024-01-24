@@ -27,6 +27,7 @@
 // 0.10: Added link to quickly go to league matches (and new match for semi pro)
 // 0.11: Added bloodbowlleauge.net
 // 0.12: Added https://www.anarchy.bloodbowlleauge.net
+// 0.13: Added Sums row to team roster
 
 (function() {
     'use strict';
