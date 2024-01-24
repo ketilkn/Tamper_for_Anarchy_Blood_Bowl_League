@@ -1,16 +1,17 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.com/
-// @version      0.12
+// @version      0.13
 // @description  Convert onclick to anchor for bloodbowlleague.com
 // @license      MIT
+// @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
 // @author       Ketil Nordstad
 // @match        http://*.bloodbowlleague.com/*
 // @match        http://*.bloodbowlleague.net/*
 // @match        https://www.anarchy.bloodbowlleague.net/*
 // @match        http://www.arosbb.dk/*
 // @grant        none
-// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js  
+// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js 
 // @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
@@ -105,6 +106,112 @@
         return el.onclick.toString().match(/\'.*.*\'/g).toString().slice(1,-1);
 
 
+    };
+
+    var isPlayerTemporaryRetired = function(el) {
+        const columns = el.children;
+        if (columns[11].querySelector('img') && columns[11].querySelector('img').src.endsWith("retire.png")) {
+            return true;
+        }
+        return false;
+    };
+    var isPlayerMng = function(el) {
+        const columns = el.children;
+        return el.children[9].innerText == "M"; // && !isPlayerTemporaryRetired(el);
+    };
+
+    var isPlayer = function(row) {
+        return row.classList.containes("trlist");
+    };
+
+    var getPlayerName = function(row) {
+        return row.children[2].children[1].childNodes[0].nodeValue;
+    };
+    var getPlayerSkillsBasic = function(row) {
+        const skillsNodes = row.children[8].childNodes[1].childNodes[0].nodeValue;
+        if(skillsNodes) {
+            return skillsNodes.split(',').map((s) => s.trim()).filter((v) => v);
+        }
+        return [];
+    };
+
+    var getPlayerSkillsImprovements = function(row) {
+        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r!="?");
+    };
+
+
+    var getPlayerPosition = function(row) {
+        return row.children[2].children[1].childNodes[row.children[2].children[1].childNodes.length-1].innerText;
+    };
+    var getPlayerMa = function(row) {
+        return parseInt(row.children[3].innerText);
+    }
+    var getPlayerSt = function(row) {
+        return parseInt(row.children[4].innerText);
+    }
+    var getPlayerAg = function(row) {
+        return parseInt(row.children[5].innerText);
+    }
+    var getPlayerPa = function(row) {
+        return parseInt(row.children[6].innerText);
+    }
+    var getPlayerAv = function(row) {
+        return parseInt(row.children[7].innerText);
+    }
+    var getPlayerNiggles = function(row) {
+        var niggles = parseInt(row.children[10].innerText);
+        if(niggles) {
+            return niggles;
+        }
+        return 0;
+    }
+
+    var getPlayerSppTotal = function(row) {
+        return parseInt(row.children[17].childNodes[1].childNodes[1].innerText.replace("(","").replace(")","").trim())
+    }
+
+    var getPlayerSppUnspent = function(row) {
+        return parseInt(row.children[17].childNodes[1].childNodes[0].nodeValue)
+    }
+
+    var parsePlayer = function(row) {
+        const playerInfo = {
+            number: parseInt(row.children[0].innerText),
+            name: getPlayerName(row),
+            url: row.querySelector('a').href,
+            position: getPlayerPosition(row),
+            ma: getPlayerMa(row),
+            st: getPlayerSt(row),
+            ag: getPlayerAg(row),
+            pa: getPlayerPa(row),
+            av: getPlayerAv(row),
+            skills: getPlayerSkillsBasic(row) + getPlayerSkillsImprovements(row),
+            skillsBasic: getPlayerSkillsBasic(row),
+            skillsImprovement: getPlayerSkillsImprovements(row),
+            missNextGame: isPlayerMng(row),
+            niggles: getPlayerNiggles(row),
+            spp: getPlayerSppTotal(row),
+            sppUnspent: getPlayerSppUnspent(row),
+            temporaryRetired: isPlayerTemporaryRetired(row),
+            currentValue: parseInt(row.querySelectorAll('td')[16].innerText),
+            theRow: row
+        };
+        return playerInfo;
+    };
+
+    var countPlayerSkills = function(players) {
+        var extraSkills = players.map(p => p.skillImprovements);
+        var extraSkillCount = {};
+        players.forEach((player) => {
+            player.skillsImprovement.forEach((skill) => {
+                if(! extraSkillCount[skill]) {
+                    extraSkillCount[skill] = 1;
+                } else {
+                    extraSkillCount[skill] = extraSkillCount[skill] + 1;
+                }
+            });
+        });
+        return extraSkillCount;
     };
 
     var processTdOnClick = function(td) {
@@ -255,6 +362,51 @@
 
     };
 
+    var addRosterSums = function (players) {
+        var activePlayers = players.filter((p)=>!p.missNextGame);
+        var playerCount = activePlayers.length;
+
+        var playerPrices = activePlayers.map(p=>p.currentValue);
+        var playersPriceTotal = playerPrices.reduce((totalValue, playerValue) => { return totalValue + playerValue}, 0);
+        var playersSpp = activePlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
+        var skillCount = document.playerValues.map((p)=>p.skillsImprovement.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
+        //skillCount = "";
+        //var counts = countPlayerSkills(activePlayers).map((s)=> s[0] + "(" + s[1] + ")");
+        //skillCount = counts.join(', ');
+        var skills = Object.entries(countPlayerSkills(activePlayers))
+        skills.sort(function(a, b) { return b[1] - a[1]; });
+        skillCount = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
+        var mngCount = document.playerValues.filter((p)=>p.missNextGame).length;
+        var niggleCount = document.playerValues.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
+        var tempRetireCount = document.playerValues.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
+
+        var borderRow = document.querySelector('tr.trborder:nth-child(18)');
+        var playerRowHtml = activePlayers[activePlayers.length-1].theRow.innerHTML
+
+        var sumRow = document.createElement("tr");
+        sumRow.innerHTML = playerRowHtml;
+        sumRow.className = "trlist";
+
+
+        sumRow.children[0].innerText="sum";
+        sumRow.children[0].align="center";
+        sumRow.children[1].innerText="";
+        sumRow.children[2].innerText=activePlayers.length + " ready";
+        sumRow.children[2].align = "center";
+        sumRow.children[3].innerText=sumRow.children[4].innerText=sumRow.children[5].innerText=sumRow.children[6].innerText=sumRow.children[7].innerText="";
+        sumRow.children[8].innerText = skillCount;
+        sumRow.children[9].innerText = mngCount;
+        sumRow.children[10].innerText = niggleCount;
+        sumRow.children[11].innerText = tempRetireCount;
+        sumRow.children[14].innerText ="";
+        sumRow.children[15].innerText ="";
+        sumRow.children[16].innerText ="";
+        sumRow.children[17].innerText =playersSpp;
+        sumRow.children[18].innerText = playersPriceTotal + " k ";
+
+        borderRow.parentNode.insertBefore(sumRow, borderRow);
+    };
+
     var addDropdownSearch = function(name) {
         var targets = document.getElementsByName(name);
     
@@ -292,9 +444,22 @@
     };
 
     addDropdownSearch("bountyspiller");
-    addDropdownSearch("m0team1"); 
+    addDropdownSearch("m0team1");
     addDropdownSearch("m0team2");
-     
+    document.countPlayerSkills = countPlayerSkills;
+    if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
+        const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
+        const playerValues = players.map((row) => parsePlayer(row));
+        document.playerValues = playerValues;
+        addRosterSums(playerValues);
+    } else {
+        document.playerValues = {no_players: true};
+
+    }
+
+
+
+
 
     //Remove javascript log out
     var timer_id = window.setTimeout(function() {}, 0);
