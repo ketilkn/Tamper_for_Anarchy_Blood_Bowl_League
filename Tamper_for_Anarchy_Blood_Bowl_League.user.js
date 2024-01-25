@@ -1,15 +1,14 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
-// @namespace    http://www.anarchy.bloodbowlleague.com/
-// @version      0.14
-// @description  Convert onclick to anchor for bloodbowlleague.com
+// @namespace    http://www.anarchy.bloodbowlleague.net/
+// @version      0.15
+// @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
 // @author       Ketil Nordstad
-// @match        http://*.bloodbowlleague.com/*
-// @match        http://*.bloodbowlleague.net/*
+// @match        https://*.bloodbowlleague.net/*
 // @match        https://www.anarchy.bloodbowlleague.net/*
-// @match        http://www.arosbb.dk/*
+// @match        https://www.arosbb.dk/*
 // @grant        none
 // @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js 
 // @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
@@ -29,6 +28,7 @@
 // 0.12: Added https://www.anarchy.bloodbowlleauge.net
 // 0.13: Added Sums row to team roster
 // 0.14: Improved skill count. Added average for player characteristics
+// 0.15: Changed URL matchers to use bloodbowlleague.net
 
 (function() {
     'use strict';
