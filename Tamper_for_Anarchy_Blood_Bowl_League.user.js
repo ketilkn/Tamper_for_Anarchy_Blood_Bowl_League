@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.15
+// @version      0.16
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -10,25 +10,26 @@
 // @match        https://www.anarchy.bloodbowlleague.net/*
 // @match        https://www.arosbb.dk/*
 // @grant        none
-// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js 
+// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js
 // @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
 // 0.1: Initial version. Replace onclick player, match with anchor. Remove timeout and add keep alive
 // 0.2: Replace tournament table onclick with anchor. Team name link to team. Team value link to roster.
-// 0.3: Replace menu onclick with a href 
+// 0.3: Replace menu onclick with a href
 // 0.4: Support all leagues at bloodbowlleague.com
 // 0.5: Added tooltip to league standings. Click on team value to open roster directly.
 // 0.6: Auto update test
 // 0.7: Searchable bounty selector, support for arosbb.dk.
 // 0.8: Improved bounty selector. Support for arrowkeys. Fixed empty search text bug.
-// 0.9: Added search to new match 
+// 0.9: Added search to new match
 // 0.10: Added link to quickly go to league matches (and new match for semi pro)
 // 0.11: Added bloodbowlleauge.net
 // 0.12: Added https://www.anarchy.bloodbowlleauge.net
 // 0.13: Added Sums row to team roster
 // 0.14: Improved skill count. Added average for player characteristics
 // 0.15: Changed URL matchers to use bloodbowlleague.net
+// 0.16: Add link to show SPP details
 
 (function() {
     'use strict';
@@ -66,7 +67,7 @@
     });
     value = el.currentStyle[styleProp];
     // convert other units to pixels on IE
-    if (/^\d+(em|pt|%|ex)?$/i.test(value)) { 
+    if (/^\d+(em|pt|%|ex)?$/i.test(value)) {
       return (function(value) {
         var oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
         el.runtimeStyle.left = el.currentStyle.left;
@@ -80,7 +81,7 @@
     return value;
   }
 }
-    
+
     function hasClass( target, className ) {
         return new RegExp('(\\s|^)' + className + '(\\s|$)').test(target.className);
     }
@@ -203,9 +204,14 @@
             skillsImprovementAvailable: getPlayerSkillsImprovements(row),
             missNextGame: isPlayerMng(row),
             niggles: getPlayerNiggles(row),
+            temporaryRetired: isPlayerTemporaryRetired(row),
+            interceptions: ~~parseInt(row.children[12].textContent),
+            completions: ~~parseInt(row.children[13].textContent),
+            touchdowns: ~~parseInt(row.children[14].textContent),
+            casualties: ~~parseInt(row.children[15].textContent),
+            mvp: ~~parseInt(row.children[16].textContent),
             spp: getPlayerSppTotal(row),
             sppUnspent: getPlayerSppUnspent(row),
-            temporaryRetired: isPlayerTemporaryRetired(row),
             currentValue: parseInt(row.querySelectorAll('td')[16].innerText),
             theRow: row
         };
@@ -268,7 +274,7 @@
         var td = el.querySelectorAll("td");
 
         for(var j = 0; j < td.length; j++) {
-            wrapAnchor(td[j], link);  
+            wrapAnchor(td[j], link);
             wrapAnchor(td[j], link);
 
         }
@@ -344,7 +350,7 @@
                 element.dropdown.appendChild(foo);
             }
 
-        }  
+        }
     };
 
     var updateDropdown = function(event, el) {
@@ -352,14 +358,14 @@
         console.log("Søk:"+this.value + ":" +this.dropdown.options.length);
 
         if(event.keyCode == 38 ) {
-            //up   
+            //up
             var index = this.dropdown.selectedIndex;
             if(index > 0 ) {
                 this.dropdown.selectedIndex = index -1;
             }
 
         }else if (event.keyCode == 40 ) {
-            //down    
+            //down
             var idx = this.dropdown.selectedIndex;
             if(idx < this.dropdown.length -1 ) {
                 this.dropdown.selectedIndex =idx +1;
@@ -370,8 +376,6 @@
         }else {
             applyDropdownFilter(this);
         }
-
-        console.log(event.keyCode + " " +this.value +" Added " + this.dropdown.size + " in " + (new Date().getTime() - time)+ "ms");
 
     };
 
@@ -402,8 +406,14 @@
         }
 
         var mngCount = document.playerValues.filter((p)=>p.missNextGame).length;
-        var niggleCount = document.playerValues.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
+        var niggleSum = document.playerValues.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
         var tempRetireCount = document.playerValues.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
+
+        var interceptionsSum = document.playerValues.map((p)=>p.interceptions).reduce((totalInterceptions, playerInterceptions) => { return totalInterceptions + playerInterceptions}, 0);
+        var completionsSum = document.playerValues.map((p)=>p.completions).reduce((totalCompletions, playerCompletions) => { return totalCompletions + playerCompletions}, 0);
+        var touchdownsSum = document.playerValues.map((p)=>p.touchdowns).reduce((totalTouchdowns, playerTouchdowns) => { return totalTouchdowns + playerTouchdowns}, 0);
+        var casualtiesSum = document.playerValues.map((p)=>p.casualties).reduce((totalCasualties, playerCasualties) => { return totalCasualties + playerCasualties}, 0);
+        var mvpSum = document.playerValues.map((p)=>p.mvp).reduce((totalMvp, playerMvp) => { return totalMvp + playerMvp}, 0);
 
         //var borderRow = document.querySelector('tr.trborder:nth-child(18)');
         var borderRow = document.querySelector('table.tblist tr.trborder');
@@ -433,11 +443,13 @@
         }};
 
         sumRow.children[9].innerText = mngCount;
-        sumRow.children[10].innerText = niggleCount;
+        sumRow.children[10].innerText = niggleSum;
         sumRow.children[11].innerText = tempRetireCount;
-        sumRow.children[14].innerText ="";
-        sumRow.children[15].innerText ="";
-        sumRow.children[16].innerText ="";
+        sumRow.children[12].innerText = interceptionsSum;
+        sumRow.children[13].innerText =completionsSum;
+        sumRow.children[14].innerText =touchdownsSum;
+        sumRow.children[15].textContent=casualtiesSum;
+        sumRow.children[16].textContent=mvpSum;
         sumRow.children[17].innerText =playersSpp;
         sumRow.children[18].innerText = playersPriceTotal + " k ";
 
@@ -446,7 +458,7 @@
 
     var addDropdownSearch = function(name) {
         var targets = document.getElementsByName(name);
-    
+
         for(var i=0; i < targets.length; i++) {
             var target = targets[i];
             var targetWidth =  getStyle(target, "width");
@@ -480,23 +492,74 @@
         }
     };
 
+    var fixLastTdColspan = function (roster) {
+        for(let i = roster.querySelectorAll('tr').length - 8; i < roster.querySelectorAll('tr').length; i++) {
+            let row = roster.querySelectorAll('tr')[i];
+            if(row.children.length < 19) {
+                let colSpan = row.children.length - 18;
+                row.children[row.children.length-1].colSpan = 6;
+            }
+        }
+    }
+
+    var toggleRosterStats = function () {
+        var roster = document.querySelector(".tblist");
+        var rosterHeadingRow = document.querySelector(".tblist .trlisthead");
+        var rosterRows = [...document.querySelectorAll(".tblist tr")].filter((row) => !row.classList.contains("trborder"));
+
+        var teamBadgeColumn = document.querySelector(".trborder .esmall9");
+
+        rosterRows.forEach((row) => {
+            row.children[10].style.display="table-cell";
+            row.children[11].style.display="table-cell";
+            row.children[12].style.display="table-cell";
+            row.children[13].style.display="table-cell";
+            row.children[14].style.display="table-cell";
+            if(!row.classList.contains(".trlist") && row.children.length == 17) {
+                let missing1 = document.createElement("td");
+                missing1.className = row.children[14].className;
+                missing1.style = row.children[14].style.cssText;
+                row.insertBefore(missing1, row.children[15]);
+
+                let missing2 = document.createElement("td");
+                missing2.className = row.children[14].className;
+                missing2.style = row.children[14].style.cssText;
+                row.insertBefore(missing2, row.children[15]);
+            }
+            row.children[15].style.display="table-cell";
+            row.children[16].style.display="table-cell";
+
+            row.children[17].style.display="table-cell";
+            row.children[18].style.display="table-cell";
+        });
+        fixLastTdColspan(roster);
+
+        return true;
+    };
+
     addDropdownSearch("bountyspiller");
     addDropdownSearch("m0team1");
     addDropdownSearch("m0team2");
     document.countPlayerSkills = countPlayerSkills;
+    document.toogleRosterStats = toggleRosterStats;
     if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
+        const roster = document.querySelector(".tblist");
         const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
         const playerValues = players.map((row) => parsePlayer(row));
+
         document.playerValues = playerValues;
         addRosterSums(playerValues);
+
+        const statsToggle = document.createElement('a');
+        statsToggle.textContent = "Show SPP details";
+        statsToggle.href="#";
+        statsToggle.onclick = function() { toggleRosterStats(); statsToggle.style.display="none"; return false;};
+        roster.after(statsToggle);
+
     } else {
         document.playerValues = {no_players: true};
 
     }
-
-
-
-
 
     //Remove javascript log out
     var timer_id = window.setTimeout(function() {}, 0);
