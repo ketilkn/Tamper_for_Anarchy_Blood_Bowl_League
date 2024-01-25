@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.com/
-// @version      0.13
+// @version      0.14
 // @description  Convert onclick to anchor for bloodbowlleague.com
 // @license      MIT
 // @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -28,6 +28,7 @@
 // 0.11: Added bloodbowlleauge.net
 // 0.12: Added https://www.anarchy.bloodbowlleauge.net
 // 0.13: Added Sums row to team roster
+// 0.14: Improved skill count. Added average for player characteristics
 
 (function() {
     'use strict';
@@ -136,10 +137,15 @@
         return [];
     };
 
-    var getPlayerSkillsImprovements = function(row) {
-        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r!="?");
+    var getPlayerSkillsExtra = function(row) {
+        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim().split("(")[0]).filter((r) => r!="?");
     };
-
+    var getPlayerSkillsImprovements = function(row) {
+        if([...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r=="?").length > 0) {
+            return true;
+        }
+        return false;
+    };
 
     var getPlayerPosition = function(row) {
         return row.children[2].children[1].childNodes[row.children[2].children[1].childNodes.length-1].innerText;
@@ -154,8 +160,13 @@
         return parseInt(row.children[5].innerText);
     }
     var getPlayerPa = function(row) {
-        return parseInt(row.children[6].innerText);
+        let pa = parseInt(row.children[6].innerText);
+        if(! pa ) {
+            return 0;
+        }
+        return pa;
     }
+
     var getPlayerAv = function(row) {
         return parseInt(row.children[7].innerText);
     }
@@ -186,9 +197,10 @@
             ag: getPlayerAg(row),
             pa: getPlayerPa(row),
             av: getPlayerAv(row),
-            skills: getPlayerSkillsBasic(row) + getPlayerSkillsImprovements(row),
+            skills: getPlayerSkillsBasic(row) + getPlayerSkillsExtra(row),
             skillsBasic: getPlayerSkillsBasic(row),
-            skillsImprovement: getPlayerSkillsImprovements(row),
+            skillsExtra: getPlayerSkillsExtra(row),
+            skillsImprovementAvailable: getPlayerSkillsImprovements(row),
             missNextGame: isPlayerMng(row),
             niggles: getPlayerNiggles(row),
             spp: getPlayerSppTotal(row),
@@ -204,7 +216,7 @@
         var extraSkills = players.map(p => p.skillImprovements);
         var extraSkillCount = {};
         players.forEach((player) => {
-            player.skillsImprovement.forEach((skill) => {
+            player.skillsExtra.forEach((skill) => {
                 if(! extraSkillCount[skill]) {
                     extraSkillCount[skill] = 1;
                 } else {
@@ -367,35 +379,59 @@
         var activePlayers = players.filter((p)=>!p.missNextGame);
         var playerCount = activePlayers.length;
 
+        var meanMovement = activePlayers.map((p)=>p.ma).reduce((a, b) => a + b, 0) / activePlayers.length;
+        var meanStrength = activePlayers.map((p)=>p.st).reduce((a, b) => a + b, 0) / activePlayers.length;
+        var meanAgility = activePlayers.map((p)=>p.ag).reduce((a, b) => a + b, 0) / activePlayers.length;
+        var meanPassing = activePlayers.map((p)=>p.pa).reduce((a, b) => a + b, 0) / activePlayers.length;
+        var meanAv = activePlayers.map((p)=>p.av).reduce((a, b) => a + b, 0) / activePlayers.length;
+
         var playerPrices = activePlayers.map(p=>p.currentValue);
         var playersPriceTotal = playerPrices.reduce((totalValue, playerValue) => { return totalValue + playerValue}, 0);
         var playersSpp = activePlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
-        var skillCount = document.playerValues.map((p)=>p.skillsImprovement.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
+        var skillCount = document.playerValues.map((p)=>p.skillsExtra.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
+        var skillsImprovementCount = activePlayers.map(p=>p.skillsImprovementAvailable).reduce((totalImprovementsAvailable, playerImprovement) => { return totalImprovementsAvailable + playerImprovement}, 0);
+
         //skillCount = "";
         //var counts = countPlayerSkills(activePlayers).map((s)=> s[0] + "(" + s[1] + ")");
         //skillCount = counts.join(', ');
         var skills = Object.entries(countPlayerSkills(activePlayers))
         skills.sort(function(a, b) { return b[1] - a[1]; });
-        skillCount = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
+        var skillList = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
+        if(skillsImprovementCount > 0) {
+            skillList = skillList + " +improvements\u00a0("+ skillsImprovementCount + ")";
+        }
+
         var mngCount = document.playerValues.filter((p)=>p.missNextGame).length;
         var niggleCount = document.playerValues.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
         var tempRetireCount = document.playerValues.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
 
-        var borderRow = document.querySelector('tr.trborder:nth-child(18)');
+        //var borderRow = document.querySelector('tr.trborder:nth-child(18)');
+        var borderRow = document.querySelector('table.tblist tr.trborder');
         var playerRowHtml = activePlayers[activePlayers.length-1].theRow.innerHTML
 
         var sumRow = document.createElement("tr");
         sumRow.innerHTML = playerRowHtml;
         sumRow.className = "trlist";
 
-
         sumRow.children[0].innerText="sum";
         sumRow.children[0].align="center";
         sumRow.children[1].innerText="";
-        sumRow.children[2].innerText=activePlayers.length + " ready";
+        sumRow.children[2].innerText=playerCount + " of " + players.length + " ready";
         sumRow.children[2].align = "center";
-        sumRow.children[3].innerText=sumRow.children[4].innerText=sumRow.children[5].innerText=sumRow.children[6].innerText=sumRow.children[7].innerText="";
-        sumRow.children[8].innerText = skillCount;
+        sumRow.children[3].innerText = Math.round(meanMovement*100)/100;
+        sumRow.children[4].innerText = Math.round(meanStrength*100)/100;
+        sumRow.children[5].innerText = Math.round(meanAgility*100)/100;
+        sumRow.children[6].innerText = Math.round(meanPassing*100)/100;
+        sumRow.children[7].innerText = Math.round(meanAv*100)/100;
+        //sumRow.children[4].innerText=sumRow.children[5].innerText=sumRow.children[6].innerText=sumRow.children[7].innerText="";
+        sumRow.children[8].textContent = skillCount;
+        sumRow.children[8].id = 'SumOfSkills';
+        sumRow.children[8].onclick = function(){ if(sumRow.children[8].textContent == skillCount) {
+            sumRow.children[8].textContent = skillList;
+        } else {
+            sumRow.children[8].textContent = skillCount;
+        }};
+
         sumRow.children[9].innerText = mngCount;
         sumRow.children[10].innerText = niggleCount;
         sumRow.children[11].innerText = tempRetireCount;
