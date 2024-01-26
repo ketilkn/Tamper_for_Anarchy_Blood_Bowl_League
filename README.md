@@ -23,7 +23,7 @@ Primært for datamaskiner. Fungerer på Android med Firefox og andre nettlesere 
 ## Features
 ### Improved team roster
 
-[![Watch the video](install-video.png)](team-roster.mp4)
+[![Watch the video](install-video.png)](https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/team-roster.mp4)
 
 ## Installering (gammel)
 
