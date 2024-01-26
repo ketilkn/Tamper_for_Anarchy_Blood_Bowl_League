@@ -19,3 +19,13 @@ For å kjøre skriptet trenger du tillegget Tamper Monkey installert. https://ww
 Deretter finner man skriptet ved å besøke https://openuserjs.org/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League
 
 Primært for datamaskiner. Fungerer på Android med Firefox og andre nettlesere som har Tamper Monkey tilgjenglig.
+
+## Features
+### Improved team roster
+
+
+
+
+## Installering (gammel)
+
+[![Watch the video](install-video.png)](https://www.youtube.com/watch?v=PibPx5_7ePM)
