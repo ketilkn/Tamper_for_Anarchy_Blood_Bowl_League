@@ -23,8 +23,7 @@ Primært for datamaskiner. Fungerer på Android med Firefox og andre nettlesere 
 ## Features
 ### Improved team roster
 
-
-
+[![Watch the video](install-video.png)](team-roster.mp4)
 
 ## Installering (gammel)
 
