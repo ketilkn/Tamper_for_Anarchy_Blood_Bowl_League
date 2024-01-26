@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.16
+// @version      0.17
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
 // @author       Ketil Nordstad
-// @match        https://*.bloodbowlleague.net/*
-// @match        https://www.anarchy.bloodbowlleague.net/*
-// @match        https://www.arosbb.dk/*
+// @match        *://*.bloodbowlleague.net/*
+// @match        *://www.anarchy.bloodbowlleague.net/*
+// @match        *://www.arosbb.dk/*
 // @grant        none
 // @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js
 // @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
@@ -30,6 +30,7 @@
 // 0.14: Improved skill count. Added average for player characteristics
 // 0.15: Changed URL matchers to use bloodbowlleague.net
 // 0.16: Add link to show SPP details
+// 0.17: Add back url matchers working with http
 
 (function() {
     'use strict';
@@ -92,7 +93,7 @@
     };
 
     var wrapAnchor = function(el, link, title) {
-        var tooltip = "tra la la";
+        var tooltip = "";
         if( title && title.length > 0 ) {
             tooltip = title;
         }
@@ -315,7 +316,6 @@
         }
     };
 
-
     // CONVERT onclicks to link
     var tr_onclicks = document.querySelectorAll("tr[onclick]");
     for(var i = 0; i < tr_onclicks.length; i++) {
@@ -402,7 +402,7 @@
         skills.sort(function(a, b) { return b[1] - a[1]; });
         var skillList = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
         if(skillsImprovementCount > 0) {
-            skillList = skillList + " +improvements\u00a0("+ skillsImprovementCount + ")";
+            skillList = skillList + " +available\u00a0("+ skillsImprovementCount + ")";
         }
 
         var mngCount = document.playerValues.filter((p)=>p.missNextGame).length;
