@@ -14,5 +14,8 @@ Funksjoner
  * extra skills i team rosteren er klikkbar og gir liste over ferdigheter med antall.
  * Team roster får Show SPP details link, som viser int, cmp, td, cas, mvp per spiller og sum.
 
-For å kjøre skriptet trenger du tillegget Tamper Monkey installert. Deretter finner man skriptet ved å besøke https://openuserjs.org/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League
+For å kjøre skriptet trenger du tillegget Tamper Monkey installert. https://www.tampermonkey.net/
 
+Deretter finner man skriptet ved å besøke https://openuserjs.org/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League
+
+Primært for datamaskiner. Fungerer på Android med Firefox og andre nettlesere som har Tamper Monkey tilgjenglig.
