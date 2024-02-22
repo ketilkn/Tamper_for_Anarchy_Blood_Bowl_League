@@ -1,14 +1,19 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.17
+// @version      0.20
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
-// @copyright 2023, ketilkn (https://openuserjs.org/users/ketilkn)
+// @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
 // @author       Ketil Nordstad
-// @match        *://*.bloodbowlleague.net/*
-// @match        *://www.anarchy.bloodbowlleague.net/*
-// @match        *://www.arosbb.dk/*
+// @match        http://*.bloodbowlleague.net/*
+// @match        https://*.bloodbowlleague.net/*
+// @match        http://www.*.bloodbowlleague.net/*
+// @match        https://www.*.bloodbowlleague.net/*
+// @match        https://www.*.bbleague.net/*
+// @match        https://*.bbleague.net/*
+// @match        http://www.*.bbleague.net/*
+// @match        http://*.bbleague.net/*
 // @grant        none
 // @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js
 // @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
@@ -31,8 +36,12 @@
 // 0.15: Changed URL matchers to use bloodbowlleague.net
 // 0.16: Add link to show SPP details
 // 0.17: Add back url matchers working with http
+// 0.18: Add back url matchers working with http again
+// 0.19: Always show player statistics in the team roster
+// 0.20: Added MNG row and made rows selectable in the team roster
 
 (function() {
+    const SELECTED_PLAYER_COLOR = "lightblue";
     'use strict';
 
     //From: https://gist.github.com/niyazpk/f8ac616f181f6042d1e0
@@ -379,54 +388,66 @@
 
     };
 
-    var addRosterSums = function (players) {
-        var activePlayers = players.filter((p)=>!p.missNextGame);
-        var playerCount = activePlayers.length;
+ var updateRosterSums = function (players, sums, sumAllPlayers) {
+        let sumRow = document.querySelector("tr.totalSums");
+        if(sums) {
+            sumRow = sums;
+        }
 
-        var meanMovement = activePlayers.map((p)=>p.ma).reduce((a, b) => a + b, 0) / activePlayers.length;
-        var meanStrength = activePlayers.map((p)=>p.st).reduce((a, b) => a + b, 0) / activePlayers.length;
-        var meanAgility = activePlayers.map((p)=>p.ag).reduce((a, b) => a + b, 0) / activePlayers.length;
-        var meanPassing = activePlayers.map((p)=>p.pa).reduce((a, b) => a + b, 0) / activePlayers.length;
-        var meanAv = activePlayers.map((p)=>p.av).reduce((a, b) => a + b, 0) / activePlayers.length;
+        var selectedPlayers = players.filter((p)=>!p.missNextGame);
+        if(sumAllPlayers) {
+            selectedPlayers = players;
+        }
+        var activePlayerCount = selectedPlayers.length;
+        var playerCount = players.length;
 
-        var playerPrices = activePlayers.map(p=>p.currentValue);
+        var meanMovement = selectedPlayers.map((p)=>p.ma).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        var meanStrength = selectedPlayers.map((p)=>p.st).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        var meanAgility = selectedPlayers.map((p)=>p.ag).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        var meanPassing = selectedPlayers.map((p)=>p.pa).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        var meanAv = selectedPlayers.map((p)=>p.av).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+
+        var playerPrices = selectedPlayers.map(p=>p.currentValue);
         var playersPriceTotal = playerPrices.reduce((totalValue, playerValue) => { return totalValue + playerValue}, 0);
-        var playersSpp = activePlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
-        var skillCount = document.playerValues.map((p)=>p.skillsExtra.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
-        var skillsImprovementCount = activePlayers.map(p=>p.skillsImprovementAvailable).reduce((totalImprovementsAvailable, playerImprovement) => { return totalImprovementsAvailable + playerImprovement}, 0);
+        var playersSpp = selectedPlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
+        var skillCount = selectedPlayers.map((p)=>p.skillsExtra.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
+        var skillsImprovementCount = selectedPlayers.map(p=>p.skillsImprovementAvailable).reduce((totalImprovementsAvailable, playerImprovement) => { return totalImprovementsAvailable + playerImprovement}, 0);
 
         //skillCount = "";
-        //var counts = countPlayerSkills(activePlayers).map((s)=> s[0] + "(" + s[1] + ")");
+        //var counts = countPlayerSkills(selectedPlayers).map((s)=> s[0] + "(" + s[1] + ")");
         //skillCount = counts.join(', ');
-        var skills = Object.entries(countPlayerSkills(activePlayers))
+        var skills = Object.entries(countPlayerSkills(selectedPlayers))
         skills.sort(function(a, b) { return b[1] - a[1]; });
         var skillList = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
         if(skillsImprovementCount > 0) {
             skillList = skillList + " +available\u00a0("+ skillsImprovementCount + ")";
         }
 
-        var mngCount = document.playerValues.filter((p)=>p.missNextGame).length;
-        var niggleSum = document.playerValues.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
-        var tempRetireCount = document.playerValues.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
+        var mngCount = selectedPlayers.filter((p)=>p.missNextGame).length;
+        var niggleSum = selectedPlayers.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
+        var tempRetireCount = selectedPlayers.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
 
-        var interceptionsSum = document.playerValues.map((p)=>p.interceptions).reduce((totalInterceptions, playerInterceptions) => { return totalInterceptions + playerInterceptions}, 0);
-        var completionsSum = document.playerValues.map((p)=>p.completions).reduce((totalCompletions, playerCompletions) => { return totalCompletions + playerCompletions}, 0);
-        var touchdownsSum = document.playerValues.map((p)=>p.touchdowns).reduce((totalTouchdowns, playerTouchdowns) => { return totalTouchdowns + playerTouchdowns}, 0);
-        var casualtiesSum = document.playerValues.map((p)=>p.casualties).reduce((totalCasualties, playerCasualties) => { return totalCasualties + playerCasualties}, 0);
-        var mvpSum = document.playerValues.map((p)=>p.mvp).reduce((totalMvp, playerMvp) => { return totalMvp + playerMvp}, 0);
+        var interceptionsSum = selectedPlayers.map((p)=>p.interceptions).reduce((totalInterceptions, playerInterceptions) => { return totalInterceptions + playerInterceptions}, 0);
+        var completionsSum = selectedPlayers.map((p)=>p.completions).reduce((totalCompletions, playerCompletions) => { return totalCompletions + playerCompletions}, 0);
+        var touchdownsSum = selectedPlayers.map((p)=>p.touchdowns).reduce((totalTouchdowns, playerTouchdowns) => { return totalTouchdowns + playerTouchdowns}, 0);
+        var casualtiesSum = selectedPlayers.map((p)=>p.casualties).reduce((totalCasualties, playerCasualties) => { return totalCasualties + playerCasualties}, 0);
+        var mvpSum = selectedPlayers.map((p)=>p.mvp).reduce((totalMvp, playerMvp) => { return totalMvp + playerMvp}, 0);
 
         //var borderRow = document.querySelector('tr.trborder:nth-child(18)');
         var borderRow = document.querySelector('table.tblist tr.trborder');
-        var playerRowHtml = activePlayers[activePlayers.length-1].theRow.innerHTML
+        var sumLabel = selectedPlayers.length +" "+sumAllPlayers;
+        if(!sumAllPlayers) {
+            sumLabel = activePlayerCount + " of " + playerCount + " ready";
+        }
 
-        var sumRow = document.createElement("tr");
-        sumRow.innerHTML = playerRowHtml;
-        sumRow.className = "trlist";
+        //var sumRow = document.createElement("tr");
+        //sumRow.innerHTML = playerRowHtml;
+        //sumRow.className = "trlist sums";
 
-        sumRow.children[0].innerText="sum";
+
         sumRow.children[0].align="center";
         sumRow.children[1].innerText="";
-        sumRow.children[2].innerText=playerCount + " of " + players.length + " ready";
+        sumRow.children[2].innerText= sumLabel;
         sumRow.children[2].align = "center";
         sumRow.children[3].innerText = Math.round(meanMovement*100)/100;
         sumRow.children[4].innerText = Math.round(meanStrength*100)/100;
@@ -454,6 +475,51 @@
         sumRow.children[18].innerText = playersPriceTotal + " k ";
 
         borderRow.parentNode.insertBefore(sumRow, borderRow);
+    };
+
+
+    var addRosterSums = function(players, sumAllPlayers) {
+        var playerRowHtml = players[players.length-1].theRow.innerHTML;
+
+        var sumRow = document.createElement("tr");
+        sumRow.innerHTML = playerRowHtml;
+        sumRow.className = "trlist sums totalSums";
+        sumRow.children[0].innerText="sum";
+
+        updateRosterSums(players, sumRow, sumAllPlayers);
+
+        return sumRow;
+    };
+
+
+    var addRosterSumsReady = function(players) {
+        var playerRowHtml = players[players.length-1].theRow.innerHTML;
+        var totalSumRow = addRosterSums(players);
+        totalSumRow.className = "trlist sums totalSums";
+
+        totalSumRow.onclick = function() {
+            let selectedPlayers = players.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
+            if(selectedPlayers.length < 1 ) {
+                players.forEach((playerRow) => {playerRow.theRow.click();});
+            } else {
+                selectedPlayers.forEach((playerRow) => { playerRow.theRow.click()});
+            }
+
+        };
+        //totalSumRow.children[2].innerText="aaa";
+        return totalSumRow;
+    };
+
+      var addRosterSumsMng = function(players) {
+        var playerRowHtml = players[players.length-1].theRow.innerHTML;
+        var mngPlayers = players.filter((p)=>p.missNextGame);
+        if( mngPlayers.length < 1 ) {
+            return;
+        }
+        var mngRow = addRosterSums(mngPlayers, " missing");
+        mngRow.className = "trlist sums mngSums";
+        mngRow.children[0].innerText="mng";
+        return mngRow;
     };
 
     var addDropdownSearch = function(name) {
@@ -506,7 +572,6 @@
         var roster = document.querySelector(".tblist");
         var rosterHeadingRow = document.querySelector(".tblist .trlisthead");
         var rosterRows = [...document.querySelectorAll(".tblist tr")].filter((row) => !row.classList.contains("trborder"));
-
         var teamBadgeColumn = document.querySelector(".trborder .esmall9");
 
         rosterRows.forEach((row) => {
@@ -537,28 +602,68 @@
         return true;
     };
 
-    addDropdownSearch("bountyspiller");
-    addDropdownSearch("m0team1");
-    addDropdownSearch("m0team2");
-    document.countPlayerSkills = countPlayerSkills;
-    document.toogleRosterStats = toggleRosterStats;
-    if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
-        const roster = document.querySelector(".tblist");
-        const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
-        const playerValues = players.map((row) => parsePlayer(row));
-
-        document.playerValues = playerValues;
-        addRosterSums(playerValues);
-
+    var addStatsToggle = function (roster) {
         const statsToggle = document.createElement('a');
         statsToggle.textContent = "Show SPP details";
         statsToggle.href="#";
         statsToggle.onclick = function() { toggleRosterStats(); statsToggle.style.display="none"; return false;};
         roster.after(statsToggle);
+    };
+
+    var addPlayerSkillFunctionsToDocument = function(playerValues) {
+        document.countPlayerSkills = countPlayerSkills;
+        document.toogleRosterStats = toggleRosterStats;
+        document.playerValues = playerValues;
+    };
+
+    var selectPlayerRow = function(row, rosterRows) {
+        if(!row.style.backgroundColor || row.style.backgroundColor !== SELECTED_PLAYER_COLOR) {
+            row.oldBackgroundColor = row.style.backgroundColor;
+            row.style.backgroundColor = SELECTED_PLAYER_COLOR;
+        } else if ( row.oldBackgroundColor ) {
+            row.style.backgroundColor = row.oldBackgroundColor;
+        } else {
+            row.style.backgroundColor = null;
+        }
+        var selectedPlayers = rosterRows.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
+        var selectedPlayersCount = selectedPlayers.length;
+        document.selectedPlayers = selectedPlayers;
+        console.log(selectedPlayers);
+        console.log("Clicked row");
+        console.log(row);
+        console.log("There are " + selectedPlayersCount + " rows selected");
+        if ( selectedPlayersCount > 0 ) {
+            updateRosterSums(selectedPlayers, document.querySelector("tr.totalSums"), "selected");
+        } else {
+            updateRosterSums(rosterRows, document.querySelector("tr.totalSums"), false);
+        }
+    };
+
+    var makeRosterRowsClickable = function(rosterRows) {
+        rosterRows.forEach((player) => {
+            let row = player.theRow;
+            row.style.cursor = "crosshair";
+            row.onclick = function() {selectPlayerRow(row, rosterRows)};
+        });
+    };
+
+    addDropdownSearch("bountyspiller");
+    addDropdownSearch("m0team1");
+    addDropdownSearch("m0team2");
+
+    if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
+        const roster = document.querySelector(".tblist");
+        const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
+        const playerValues = players.map((row) => parsePlayer(row));
+
+        makeRosterRowsClickable(playerValues);
+        addPlayerSkillFunctionsToDocument(playerValues);
+        addRosterSumsMng(playerValues);
+        addRosterSumsReady(playerValues);
+        toggleRosterStats();
 
     } else {
         document.playerValues = {no_players: true};
-
     }
 
     //Remove javascript log out
