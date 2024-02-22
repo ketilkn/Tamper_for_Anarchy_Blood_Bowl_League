@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.20
+// @version      0.21
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -39,6 +39,7 @@
 // 0.18: Add back url matchers working with http again
 // 0.19: Always show player statistics in the team roster
 // 0.20: Added MNG row and made rows selectable in the team roster
+// 0.21: Fix bug in team roster select all/none toggle
 
 (function() {
     const SELECTED_PLAYER_COLOR = "lightblue";
@@ -497,7 +498,7 @@
         var totalSumRow = addRosterSums(players);
         totalSumRow.className = "trlist sums totalSums";
 
-        totalSumRow.onclick = function() {
+        totalSumRow.children[2].onclick = function() {
             let selectedPlayers = players.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
             if(selectedPlayers.length < 1 ) {
                 players.forEach((playerRow) => {playerRow.theRow.click();});
