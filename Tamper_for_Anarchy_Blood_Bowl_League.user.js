@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Viagra for Anarchy Blood Bowl League
+// @name         Tamper for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
 // @version      0.21
 // @description  Convert onclick to anchor for bloodbowlleague.net
@@ -15,8 +15,8 @@
 // @match        http://www.*.bbleague.net/*
 // @match        http://*.bbleague.net/*
 // @grant        none
-// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js
-// @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
+// @updateURL    https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/rename-test/Tamper_for_Anarchy_Blood_Bowl_League.meta.js
+// @downloadURL  https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/rename-test/Tamper_for_Anarchy_Blood_Bowl_League.user.jss
 // ==/UserScript==
 
 // 0.1: Initial version. Replace onclick player, match with anchor. Remove timeout and add keep alive
@@ -40,6 +40,7 @@
 // 0.19: Always show player statistics in the team roster
 // 0.20: Added MNG row and made rows selectable in the team roster
 // 0.21: Fix bug in team roster select all/none toggle
+// 0.22: Renamed to tamper
 
 (function() {
     const SELECTED_PLAYER_COLOR = "lightblue";
