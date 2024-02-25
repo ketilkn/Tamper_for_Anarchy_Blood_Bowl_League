@@ -536,7 +536,16 @@
         mngRow.children[0].innerText="mng";
         return mngRow;
     };
-
+    const reformatMngPlayers = function(players) {
+        const mngPlayers = players.filter((p) => p.missNextGame);
+        if (mngPlayers.length < 1) {
+            return;
+        }
+        mngPlayers.forEach((player) => {
+            player.theRow.children[0].style.textDecoration = 'line-through';
+            player.theRow.children[1].style.textDecoration = 'line-through';
+        });
+    }
     const addDropdownSearch = function(name) {
         let targets = document.getElementsByName(name);
 
@@ -671,6 +680,7 @@
         addPlayerSkillFunctionsToDocument(playerValues);
         addRosterSumsMng(playerValues);
         addRosterSumsReady(playerValues);
+        reformatMngPlayers(playerValues);
         toggleRosterStats();
 
     } else {
