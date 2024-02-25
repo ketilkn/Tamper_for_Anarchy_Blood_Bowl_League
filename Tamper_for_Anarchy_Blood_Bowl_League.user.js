@@ -39,7 +39,7 @@
 // 0.18: Add back url matchers working with http again
 // 0.19: Always show player statistics in the team roster
 // 0.20: Added MNG row and made rows selectable in the team roster
-// 0.21: Fix bug in team roster select all/none toggle
+// 0.22: Fix bug in team roster select all/none toggle
 
 (function() {
     const SELECTED_PLAYER_COLOR = "lightblue";
