@@ -16,7 +16,7 @@
 // @match        http://*.bbleague.net/*
 // @grant        none
 // @updateURL    https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Tamper_for_Anarchy_Blood_Bowl_League.meta.js
-// @downloadURL  https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Viagra_for_Anarchy_Blood_Bowl_League.user.js
+// @downloadURL  https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Tamper_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
 // 0.1: Initial version. Replace onclick player, match with anchor. Remove timeout and add keep alive
