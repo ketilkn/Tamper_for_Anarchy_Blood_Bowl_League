@@ -1,15 +1,21 @@
 <?php
 header("Content-Type: text/html; charset=iso-8859-1");
-
+function load_with_script_tag($filename) {
+    $content = file_get_contents($filename);
+    $load_tamper_tag = '<script type="text/javascript" src="http://tamper.test/Tamper_for_Anarchy_Blood_Bowl_League.user.js"></script></body>';
+    if(strpos($content, $load_tamper_tag)===false) {
+        $content = str_replace("</body>", $load_tamper_tag, $content);
+    }
+    echo $content;
+}
 if( $_GET['p'] && $_GET['p'] == 'ro') {
     if($_GET['t'] == 'loei') {
-        require('loei.html');
+        load_with_script_tag('loei.html');
     }else if ($_GET['t'] == 'cri') {
-        require('cri.html');
+        load_with_script_tag('cri.html');
     }
-    echo "hello";
 }else if ($_GET['p'] && $_GET['p'] == 'ans') {
-    require('purchase.html');
+    load_with_script_tag('purchase.html');
 }else {
 ?>
 <ul>
