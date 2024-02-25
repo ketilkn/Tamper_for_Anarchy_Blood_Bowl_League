@@ -474,13 +474,16 @@
         borderRow.parentNode.insertBefore(sumRow, borderRow);
     };
 
-
     var addRosterSums = function(players, sumAllPlayers) {
-        var playerRowHtml = players[players.length-1].theRow.innerHTML;
+        let selectionSums = document.querySelector('tr.selectionSums');
+        if (selectionSums) {
+            return selectionSums;
+        }
 
-        var sumRow = document.createElement("tr");
+        let playerRowHtml = players[players.length-1].theRow.innerHTML;
+        let sumRow = document.createElement("tr");
         sumRow.innerHTML = playerRowHtml;
-        sumRow.className = "trlist sums totalSums";
+        sumRow.className = "trlist sums allSums";
         sumRow.children[0].innerText="sum";
 
         updateRosterSums(players, sumRow, sumAllPlayers);
@@ -488,6 +491,20 @@
         return sumRow;
     };
 
+    const addRosterSelectionSum = function(players) {
+        const rowLabel = "selected";
+        let selectionSums = document.querySelector('tr.selectionSums');
+        if (selectionSums) {
+            updateRosterSums(players, selectionSums, rowLabel);
+            return selectionSums;
+        }
+
+        const sumRow= addRosterSums(players, rowLabel);
+        sumRow.id="selectedPlayers";
+        sumRow.children[0].innerText="sel";
+        sumRow.className = "trlist sums selectionSums";
+        return sumRow;
+    };
 
     const addRosterSumsReady = function(players) {
         const totalSumRow = addRosterSums(players);
@@ -622,14 +639,12 @@
         const selectedPlayers = rosterRows.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
         const selectedPlayersCount = selectedPlayers.length;
         document.selectedPlayers = selectedPlayers;
-        console.log(selectedPlayers);
-        console.log("Clicked row");
-        console.log(row);
-        console.log("There are " + selectedPlayersCount + " rows selected");
+
         if ( selectedPlayersCount > 0 ) {
-            updateRosterSums(selectedPlayers, document.querySelector("tr.totalSums"), "selected");
+            addRosterSelectionSum(selectedPlayers);
         } else {
-            updateRosterSums(rosterRows, document.querySelector("tr.totalSums"), false);
+            let selectedPlayersSums = addRosterSelectionSum(selectedPlayers, 'Zelected');
+            selectedPlayersSums.remove();
         }
     };
 
