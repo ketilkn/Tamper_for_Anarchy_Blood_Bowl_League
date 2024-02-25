@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.22
+// @version      0.23
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -40,6 +40,7 @@
 // 0.19: Always show player statistics in the team roster
 // 0.20: Added MNG row and made rows selectable in the team roster
 // 0.22: Fix bug in team roster select all/none toggle
+// 0.23: Team roster has separate row for selected players + bugfixes
 
 (function() {
     const SELECTED_PLAYER_COLOR = "lightblue";
