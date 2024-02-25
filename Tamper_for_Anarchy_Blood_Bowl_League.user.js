@@ -134,7 +134,7 @@
     };
 
     const isPlayer = function(row) {
-        return row.classList.containes("trlist");
+        return row.classList.contains("trlist") && !row.classList.contains("sums");
     };
 
     const getPlayerName = function(row) {
@@ -196,6 +196,9 @@
     }
 
     const parsePlayer = function(row) {
+        if(!isPlayer(row)) {
+            return false;
+        }
         return {
             number: parseInt(row.children[0].innerText),
             name: getPlayerName(row),
@@ -359,9 +362,7 @@
         }
     };
 
-    const updateDropdown = function(event, el) {
-        console.log("Søk:"+this.value + ":" +this.dropdown.options.length);
-
+    const updateDropdown = function(event) {
         if(event.keyCode == 38 ) {
             //up
             var index = this.dropdown.selectedIndex;
