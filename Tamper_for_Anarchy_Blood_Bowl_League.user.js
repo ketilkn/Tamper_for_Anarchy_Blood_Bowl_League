@@ -446,11 +446,11 @@
         sumRow.children[1].innerText="";
         sumRow.children[2].innerText= sumLabel;
         sumRow.children[2].align = "center";
-        sumRow.children[3].innerText = Math.round(meanMovement*100)/100;
-        sumRow.children[4].innerText = Math.round(meanStrength*100)/100;
-        sumRow.children[5].innerText = Math.round(meanAgility*100)/100;
-        sumRow.children[6].innerText = Math.round(meanPassing*100)/100;
-        sumRow.children[7].innerText = Math.round(meanAv*100)/100;
+        sumRow.children[3].innerText = (Math.round(meanMovement*100)/100).toFixed(2);
+        sumRow.children[4].innerText = (Math.round(meanStrength*100)/100).toFixed(2);
+        sumRow.children[5].innerText = (Math.round(meanAgility*100)/100).toFixed(2);
+        sumRow.children[6].innerText = (Math.round(meanPassing*100)/100).toFixed(2);
+        sumRow.children[7].innerText = (Math.round(meanAv*100)/100).toFixed(2);
         //sumRow.children[4].innerText=sumRow.children[5].innerText=sumRow.children[6].innerText=sumRow.children[7].innerText="";
         sumRow.children[8].textContent = skillCount;
         sumRow.children[8].id = 'SumOfSkills';
