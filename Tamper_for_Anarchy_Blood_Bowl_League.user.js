@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Viagra for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.21
+// @version      0.22
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -15,8 +15,8 @@
 // @match        http://www.*.bbleague.net/*
 // @match        http://*.bbleague.net/*
 // @grant        none
-// @updateURL    https://openuserjs.org/meta/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.meta.js
-// @downloadURL  https://openuserjs.org/src/scripts/ketilkn/Viagra_for_Anarchy_Blood_Bowl_League.user.js
+// @updateURL    https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Tamper_for_Anarchy_Blood_Bowl_League.meta.js
+// @downloadURL  https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Viagra_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
 // 0.1: Initial version. Replace onclick player, match with anchor. Remove timeout and add keep alive
