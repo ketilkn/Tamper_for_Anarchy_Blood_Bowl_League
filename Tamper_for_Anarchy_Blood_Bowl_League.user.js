@@ -660,7 +660,7 @@
     addDropdownSearch("m0team1");
     addDropdownSearch("m0team2");
 
-    if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
+    if( document.URL.indexOf("default.asp?p=ro") > 0 || document.URL.indexOf("p=ro&t=") > 0) {
         //const roster = document.querySelector(".tblist");
         const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
         const playerValues = players.map((row) => parsePlayer(row));
