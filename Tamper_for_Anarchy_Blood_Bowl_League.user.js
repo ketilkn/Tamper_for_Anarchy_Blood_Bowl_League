@@ -139,10 +139,10 @@
     };
 
     const getPlayerName = function(row) {
-        return row.children[2].children[1].childNodes[0].nodeValue;
+        return row.children[2].firstChild.textContent;
     };
     const getPlayerSkillsBasic = function(row) {
-        const skillsNodes = row.children[8].childNodes[1].childNodes[0].nodeValue;
+        const skillsNodes = row.children[8].firstChild.textContent;
         if(skillsNodes) {
             return skillsNodes.split(',').map((s) => s.trim()).filter((v) => v);
         }
@@ -150,15 +150,20 @@
     };
 
     const getPlayerSkillsExtra = function(row) {
-        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim().split("(")[0]).filter((r) => r!="?");
+        const extraSkills = [...row.children[8].children];
+        return extraSkills.map((s) => s.textContent).filter((s) =>
+            s.trim() !== "," && s.trim() !== "?");
+
     };
     const getPlayerSkillsImprovements = function(row) {
+        const extraSkills = [...row.children[8].childNodes].slice(1)
+        return extraSkills.filter((r) => r.textContent.indexOf(",")==-1).map((s) => s.innerText.trim().split("(")[0]).filter((r) => r!="?");
         return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r === "?").length > 0;
 
     };
 
     const getPlayerPosition = function(row) {
-        return row.children[2].children[1].childNodes[row.children[2].children[1].childNodes.length-1].innerText;
+        return row.children[2].lastChild.textContent;
     };
     const getPlayerMa = function(row) {
         return parseInt(row.children[3].innerText);
@@ -189,11 +194,11 @@
     }
 
     const getPlayerSppTotal = function(row) {
-        return parseInt(row.children[17].childNodes[1].childNodes[1].innerText.replace("(","").replace(")","").trim())
+        return parseInt(row.children[17].childNodes[1].textContent.replace("(","").replace(")","").trim());
     }
 
     const getPlayerSppUnspent = function(row) {
-        return parseInt(row.children[17].childNodes[1].childNodes[0].nodeValue)
+            return parseInt(row.children[17].childNodes[0].textContent);
     }
 
     const parsePlayer = function(row) {
@@ -203,7 +208,7 @@
         return {
             number: parseInt(row.children[0].innerText),
             name: getPlayerName(row),
-            url: row.querySelector('a').href,
+            url: extractLink(row), //row.querySelector('a').href,
             position: getPlayerPosition(row),
             ma: getPlayerMa(row),
             st: getPlayerSt(row),
@@ -329,6 +334,9 @@
     // CONVERT onclicks to link
     const tr_onclicks = document.querySelectorAll("tr[onclick]");
     for(var i = 0; i < tr_onclicks.length; i++) {
+        if(tr_onclicks[i].classList.contains('trlist')) {
+            continue;
+        }
         processTrOnClick(tr_onclicks[i]);
         tr_onclicks[i].onclick="";
         tr_onclicks[i].style.cursor="default";
@@ -546,6 +554,13 @@
             player.theRow.children[1].style.textDecoration = 'line-through';
         });
     }
+
+    const addClickablePlayerName = function(players) {
+        players.forEach((player) => {
+            wrapAnchor(player.theRow.children[2], player.url, player.name);
+        });
+    }
+
     const addDropdownSearch = function(name) {
         let targets = document.getElementsByName(name);
 
@@ -680,8 +695,11 @@
         addPlayerSkillFunctionsToDocument(playerValues);
         addRosterSumsMng(playerValues);
         addRosterSumsReady(playerValues);
+        addClickablePlayerName(playerValues);
         reformatMngPlayers(playerValues);
         toggleRosterStats();
+
+        document.getPlayerSkillsExtra = getPlayerSkillsExtra;
 
     } else {
         document.playerValues = {no_players: true};
