@@ -124,24 +124,23 @@
 
     var isPlayerTemporaryRetired = function(el) {
         const columns = el.children;
-        if (columns[11].querySelector('img') && columns[11].querySelector('img').src.endsWith("retire.png")) {
-            return true;
-        }
-        return false;
-    };
-    var isPlayerMng = function(el) {
-        const columns = el.children;
-        return el.children[9].innerText == "M"; // && !isPlayerTemporaryRetired(el);
+        return columns[11].querySelector('img') && columns[11].querySelector('img').src.endsWith("retire.png");
+
     };
 
-    var isPlayer = function(row) {
+    const isPlayerMng = function(el) {
+        const columns = el.children;
+        return el.children[9].innerText === "M"; // && !isPlayerTemporaryRetired(el);
+    };
+
+    const isPlayer = function(row) {
         return row.classList.containes("trlist");
     };
 
-    var getPlayerName = function(row) {
+    const getPlayerName = function(row) {
         return row.children[2].children[1].childNodes[0].nodeValue;
     };
-    var getPlayerSkillsBasic = function(row) {
+    const getPlayerSkillsBasic = function(row) {
         const skillsNodes = row.children[8].childNodes[1].childNodes[0].nodeValue;
         if(skillsNodes) {
             return skillsNodes.split(',').map((s) => s.trim()).filter((v) => v);
@@ -149,29 +148,27 @@
         return [];
     };
 
-    var getPlayerSkillsExtra = function(row) {
+    const getPlayerSkillsExtra = function(row) {
         return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim().split("(")[0]).filter((r) => r!="?");
     };
-    var getPlayerSkillsImprovements = function(row) {
-        if([...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r=="?").length > 0) {
-            return true;
-        }
-        return false;
+    const getPlayerSkillsImprovements = function(row) {
+        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r === "?").length > 0;
+
     };
 
-    var getPlayerPosition = function(row) {
+    const getPlayerPosition = function(row) {
         return row.children[2].children[1].childNodes[row.children[2].children[1].childNodes.length-1].innerText;
     };
-    var getPlayerMa = function(row) {
+    const getPlayerMa = function(row) {
         return parseInt(row.children[3].innerText);
     }
-    var getPlayerSt = function(row) {
+    const getPlayerSt = function(row) {
         return parseInt(row.children[4].innerText);
     }
-    var getPlayerAg = function(row) {
+    const getPlayerAg = function(row) {
         return parseInt(row.children[5].innerText);
     }
-    var getPlayerPa = function(row) {
+    const getPlayerPa = function(row) {
         let pa = parseInt(row.children[6].innerText);
         if(! pa ) {
             return 0;
@@ -179,27 +176,27 @@
         return pa;
     }
 
-    var getPlayerAv = function(row) {
+    const getPlayerAv = function(row) {
         return parseInt(row.children[7].innerText);
     }
-    var getPlayerNiggles = function(row) {
-        var niggles = parseInt(row.children[10].innerText);
+    const getPlayerNiggles = function(row) {
+        const niggles = parseInt(row.children[10].innerText);
         if(niggles) {
             return niggles;
         }
         return 0;
     }
 
-    var getPlayerSppTotal = function(row) {
+    const getPlayerSppTotal = function(row) {
         return parseInt(row.children[17].childNodes[1].childNodes[1].innerText.replace("(","").replace(")","").trim())
     }
 
-    var getPlayerSppUnspent = function(row) {
+    const getPlayerSppUnspent = function(row) {
         return parseInt(row.children[17].childNodes[1].childNodes[0].nodeValue)
     }
 
-    var parsePlayer = function(row) {
-        const playerInfo = {
+    const parsePlayer = function(row) {
+        return {
             number: parseInt(row.children[0].innerText),
             name: getPlayerName(row),
             url: row.querySelector('a').href,
@@ -226,12 +223,11 @@
             currentValue: parseInt(row.querySelectorAll('td')[16].innerText),
             theRow: row
         };
-        return playerInfo;
     };
 
-    var countPlayerSkills = function(players) {
-        var extraSkills = players.map(p => p.skillImprovements);
-        var extraSkillCount = {};
+    const countPlayerSkills = function(players) {
+        //var extraSkills = players.map(p => p.skillImprovements);
+        let extraSkillCount = {};
         players.forEach((player) => {
             player.skillsExtra.forEach((skill) => {
                 if(! extraSkillCount[skill]) {
@@ -244,11 +240,11 @@
         return extraSkillCount;
     };
 
-    var processTdOnClick = function(td) {
+    const processTdOnClick = function(td) {
         if(! td.hasAttribute("onclick")) {
             alert("I find your lack of onclick disturbing");
         }
-        var onclick = td.getAttribute("onclick").toString();
+        const onclick = td.getAttribute("onclick").toString();
         if(onclick.indexOf("gototeam") > -1 ) {
             if( (td.style.color=="rgb(32, 48, 64)" || td.style.color=="rgb(96, 96, 96)")) {
                 var teamId = extractLink(td);
@@ -280,7 +276,7 @@
 
     };
 
-    var processTrOnClick = function(el) {
+    const processTrOnClick = function(el) {
         var link = extractLink(el);
         var td = el.querySelectorAll("td");
 
@@ -296,7 +292,7 @@
 
     };
 
-    var addLinkToParent = function(el, linkText) {
+    const addLinkToParent = function(el, linkText) {
         var a = document.createElement("a");
         a.innerText=linkText;
         a.href = el.href;
@@ -304,14 +300,14 @@
         return a;
     };
 
-    var processMenuTd = function(el) {
+    const processMenuTd = function(el) {
         //alert(el.getAttribute("onclick"));
         var link = extractLink(el);
         //alert(link);
         wrapAnchor(el, link);
         el.setAttribute("onclick", "");
 
-        var leagueLink = el.querySelector('a');
+        const leagueLink = el.querySelector('a');
         if(el.querySelector('a').href.indexOf('&s=') >= 0){
             var matchLink = addLinkToParent(leagueLink, '[m]');
             matchLink.href = updateUrlParameter(matchLink.href, 'p', 'ma');
@@ -327,28 +323,28 @@
     };
 
     // CONVERT onclicks to link
-    var tr_onclicks = document.querySelectorAll("tr[onclick]");
+    const tr_onclicks = document.querySelectorAll("tr[onclick]");
     for(var i = 0; i < tr_onclicks.length; i++) {
         processTrOnClick(tr_onclicks[i]);
         tr_onclicks[i].onclick="";
         tr_onclicks[i].style.cursor="default";
     }
 
-    var td_onclicks = document.querySelectorAll("td[onclick]");
-    for(var q = 0; q < td_onclicks.length; q++) {
+    let td_onclicks = document.querySelectorAll("td[onclick]");
+    for(let q = 0; q < td_onclicks.length; q++) {
         processTdOnClick(td_onclicks[q]);
     }
 
 
     td_onclicks = document.querySelectorAll("td.menu");
-    for(q = 0; q < td_onclicks.length; q++) {
-        var menuTd = td_onclicks[q];
+    for(let q = 0; q < td_onclicks.length; q++) {
+        const menuTd = td_onclicks[q];
         if(menuTd.hasAttribute("onclick")) {
             processMenuTd(menuTd);
         }
     }
 
-    var applyDropdownFilter = function (element) {
+    const applyDropdownFilter = function (element) {
         element.dropdown.innerHTML = "";
         for(var j = 0; j < element.options.length; j++) {
             //console.log(this.options[j].name);
@@ -363,8 +359,7 @@
         }
     };
 
-    var updateDropdown = function(event, el) {
-        var time = new Date().getTime();
+    const updateDropdown = function(event, el) {
         console.log("Søk:"+this.value + ":" +this.dropdown.options.length);
 
         if(event.keyCode == 38 ) {
@@ -389,59 +384,59 @@
 
     };
 
- var updateRosterSums = function (players, sums, sumAllPlayers) {
+    const updateRosterSums = function (players, sums, sumAllPlayers) {
         let sumRow = document.querySelector("tr.totalSums");
         if(sums) {
             sumRow = sums;
         }
 
-        var selectedPlayers = players.filter((p)=>!p.missNextGame);
+        let selectedPlayers = players.filter((p)=>!p.missNextGame);
         if(sumAllPlayers) {
             selectedPlayers = players;
         }
-        var activePlayerCount = selectedPlayers.length;
-        var playerCount = players.length;
+        let activePlayerCount = selectedPlayers.length;
+        let playerCount = players.length;
 
-        var meanMovement = selectedPlayers.map((p)=>p.ma).reduce((a, b) => a + b, 0) / selectedPlayers.length;
-        var meanStrength = selectedPlayers.map((p)=>p.st).reduce((a, b) => a + b, 0) / selectedPlayers.length;
-        var meanAgility = selectedPlayers.map((p)=>p.ag).reduce((a, b) => a + b, 0) / selectedPlayers.length;
-        var meanPassing = selectedPlayers.map((p)=>p.pa).reduce((a, b) => a + b, 0) / selectedPlayers.length;
-        var meanAv = selectedPlayers.map((p)=>p.av).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        let meanMovement = selectedPlayers.map((p)=>p.ma).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        let meanStrength = selectedPlayers.map((p)=>p.st).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        let meanAgility = selectedPlayers.map((p)=>p.ag).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        let meanPassing = selectedPlayers.map((p)=>p.pa).reduce((a, b) => a + b, 0) / selectedPlayers.length;
+        let meanAv = selectedPlayers.map((p)=>p.av).reduce((a, b) => a + b, 0) / selectedPlayers.length;
 
-        var playerPrices = selectedPlayers.map(p=>p.currentValue);
-        var playersPriceTotal = playerPrices.reduce((totalValue, playerValue) => { return totalValue + playerValue}, 0);
-        var playersSpp = selectedPlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
-        var skillCount = selectedPlayers.map((p)=>p.skillsExtra.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
-        var skillsImprovementCount = selectedPlayers.map(p=>p.skillsImprovementAvailable).reduce((totalImprovementsAvailable, playerImprovement) => { return totalImprovementsAvailable + playerImprovement}, 0);
+        let playerPrices = selectedPlayers.map(p=>p.currentValue);
+        let playersPriceTotal = playerPrices.reduce((totalValue, playerValue) => { return totalValue + playerValue}, 0);
+        let playersSpp = selectedPlayers.map(p=>p.spp).reduce((totalSpp, playerSpp) => { return totalSpp + playerSpp}, 0);
+        let skillCount = selectedPlayers.map((p)=>p.skillsExtra.length).reduce((totalSkills, playerSkills) => { return totalSkills + playerSkills}, 0) + " extra skills";
+        let skillsImprovementCount = selectedPlayers.map(p=>p.skillsImprovementAvailable).reduce((totalImprovementsAvailable, playerImprovement) => { return totalImprovementsAvailable + playerImprovement}, 0);
 
         //skillCount = "";
-        //var counts = countPlayerSkills(selectedPlayers).map((s)=> s[0] + "(" + s[1] + ")");
+        //let counts = countPlayerSkills(selectedPlayers).map((s)=> s[0] + "(" + s[1] + ")");
         //skillCount = counts.join(', ');
-        var skills = Object.entries(countPlayerSkills(selectedPlayers))
+        let skills = Object.entries(countPlayerSkills(selectedPlayers))
         skills.sort(function(a, b) { return b[1] - a[1]; });
-        var skillList = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
+        let skillList = skills.map((s)=> s[0] + "(" + s[1] + ")").join(", ");
         if(skillsImprovementCount > 0) {
             skillList = skillList + " +available\u00a0("+ skillsImprovementCount + ")";
         }
 
-        var mngCount = selectedPlayers.filter((p)=>p.missNextGame).length;
-        var niggleSum = selectedPlayers.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
-        var tempRetireCount = selectedPlayers.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
+        let mngCount = selectedPlayers.filter((p)=>p.missNextGame).length;
+        let niggleSum = selectedPlayers.map((p)=>p.niggles).reduce((totalNiggle, playerNiggle) => { return totalNiggle + playerNiggle}, 0);
+        let tempRetireCount = selectedPlayers.map((p)=>p.temporaryRetired?1:0).reduce((totalTemp, playerTemp) => { return totalTemp + playerTemp}, 0);
 
-        var interceptionsSum = selectedPlayers.map((p)=>p.interceptions).reduce((totalInterceptions, playerInterceptions) => { return totalInterceptions + playerInterceptions}, 0);
-        var completionsSum = selectedPlayers.map((p)=>p.completions).reduce((totalCompletions, playerCompletions) => { return totalCompletions + playerCompletions}, 0);
-        var touchdownsSum = selectedPlayers.map((p)=>p.touchdowns).reduce((totalTouchdowns, playerTouchdowns) => { return totalTouchdowns + playerTouchdowns}, 0);
-        var casualtiesSum = selectedPlayers.map((p)=>p.casualties).reduce((totalCasualties, playerCasualties) => { return totalCasualties + playerCasualties}, 0);
-        var mvpSum = selectedPlayers.map((p)=>p.mvp).reduce((totalMvp, playerMvp) => { return totalMvp + playerMvp}, 0);
+        let interceptionsSum = selectedPlayers.map((p)=>p.interceptions).reduce((totalInterceptions, playerInterceptions) => { return totalInterceptions + playerInterceptions}, 0);
+        let completionsSum = selectedPlayers.map((p)=>p.completions).reduce((totalCompletions, playerCompletions) => { return totalCompletions + playerCompletions}, 0);
+        let touchdownsSum = selectedPlayers.map((p)=>p.touchdowns).reduce((totalTouchdowns, playerTouchdowns) => { return totalTouchdowns + playerTouchdowns}, 0);
+        let casualtiesSum = selectedPlayers.map((p)=>p.casualties).reduce((totalCasualties, playerCasualties) => { return totalCasualties + playerCasualties}, 0);
+        let mvpSum = selectedPlayers.map((p)=>p.mvp).reduce((totalMvp, playerMvp) => { return totalMvp + playerMvp}, 0);
 
-        //var borderRow = document.querySelector('tr.trborder:nth-child(18)');
-        var borderRow = document.querySelector('table.tblist tr.trborder');
-        var sumLabel = selectedPlayers.length +" "+sumAllPlayers;
+        //let borderRow = document.querySelector('tr.trborder:nth-child(18)');
+        let borderRow = document.querySelector('table.tblist tr.trborder');
+        let sumLabel = selectedPlayers.length +" "+sumAllPlayers;
         if(!sumAllPlayers) {
             sumLabel = activePlayerCount + " of " + playerCount + " ready";
         }
 
-        //var sumRow = document.createElement("tr");
+        //let sumRow = document.createElement("tr");
         //sumRow.innerHTML = playerRowHtml;
         //sumRow.className = "trlist sums";
 
@@ -493,9 +488,8 @@
     };
 
 
-    var addRosterSumsReady = function(players) {
-        var playerRowHtml = players[players.length-1].theRow.innerHTML;
-        var totalSumRow = addRosterSums(players);
+    const addRosterSumsReady = function(players) {
+        const totalSumRow = addRosterSums(players);
         totalSumRow.className = "trlist sums totalSums";
 
         totalSumRow.children[2].onclick = function() {
@@ -511,26 +505,26 @@
         return totalSumRow;
     };
 
-      var addRosterSumsMng = function(players) {
-        var playerRowHtml = players[players.length-1].theRow.innerHTML;
-        var mngPlayers = players.filter((p)=>p.missNextGame);
+      const addRosterSumsMng = function(players) {
+        const mngPlayers = players.filter((p)=>p.missNextGame);
         if( mngPlayers.length < 1 ) {
             return;
         }
-        var mngRow = addRosterSums(mngPlayers, " missing");
+
+        const mngRow = addRosterSums(mngPlayers, " missing");
         mngRow.className = "trlist sums mngSums";
         mngRow.children[0].innerText="mng";
         return mngRow;
     };
 
-    var addDropdownSearch = function(name) {
-        var targets = document.getElementsByName(name);
+    const addDropdownSearch = function(name) {
+        let targets = document.getElementsByName(name);
 
-        for(var i=0; i < targets.length; i++) {
-            var target = targets[i];
-            var targetWidth =  getStyle(target, "width");
+        for(let i=0; i < targets.length; i++) {
+            let target = targets[i];
+            let targetWidth =  getStyle(target, "width");
 
-            var dropdownSearch = document.createElement("input");
+            let dropdownSearch = document.createElement("input");
             //target.setAttribute("onchange", "");
             dropdownSearch.dropdown = target;
             dropdownSearch.setAttribute("class", "dropdown-search");
@@ -540,15 +534,15 @@
             dropdownSearch.addEventListener("keyup", updateDropdown);
 
             dropdownSearch.options = [];
-            var previousId = 0;
-            for(var j=0; j < target.childNodes.length; j++) {
-                var option = target.childNodes[j];
+            let previousId = 0;
+            for(let j=0; j < target.childNodes.length; j++) {
+                let option = target.childNodes[j];
                 //console.log(option);
                 if("OPTION" == target.childNodes[j].tagName && target.childNodes[j].value !== previousId) {
                     //console.log(target.childNodes[j].tagName +  "::" + target.childNodes[j].value+ "::" + previousId);
                     previousId = target.childNodes[j].value;
-                    var nam = option.textContent || target.childNodes[j].innerText;
-                    var player = {"id": target.childNodes[j].value, "name":nam};
+                    let nam = option.textContent || target.childNodes[j].innerText;
+                    let player = {"id": target.childNodes[j].value, "name":nam};
                     dropdownSearch.options.push( player );
                 }
 
@@ -559,21 +553,19 @@
         }
     };
 
-    var fixLastTdColspan = function (roster) {
+    const fixLastTdColspan = function (roster) {
         for(let i = roster.querySelectorAll('tr').length - 8; i < roster.querySelectorAll('tr').length; i++) {
             let row = roster.querySelectorAll('tr')[i];
             if(row.children.length < 19) {
-                let colSpan = row.children.length - 18;
                 row.children[row.children.length-1].colSpan = 6;
             }
         }
     }
 
-    var toggleRosterStats = function () {
-        var roster = document.querySelector(".tblist");
-        var rosterHeadingRow = document.querySelector(".tblist .trlisthead");
-        var rosterRows = [...document.querySelectorAll(".tblist tr")].filter((row) => !row.classList.contains("trborder"));
-        var teamBadgeColumn = document.querySelector(".trborder .esmall9");
+    const toggleRosterStats = function () {
+        const roster = document.querySelector(".tblist");
+        const rosterRows = [...document.querySelectorAll(".tblist tr")].filter((row) => !row.classList.contains("trborder"));
+        //var rosterHeadingRow = document.querySelector(".tblist .trlisthead");
 
         rosterRows.forEach((row) => {
             row.children[10].style.display="table-cell";
@@ -603,7 +595,7 @@
         return true;
     };
 
-    var addStatsToggle = function (roster) {
+    const addStatsToggle = function (roster) {
         const statsToggle = document.createElement('a');
         statsToggle.textContent = "Show SPP details";
         statsToggle.href="#";
@@ -611,13 +603,13 @@
         roster.after(statsToggle);
     };
 
-    var addPlayerSkillFunctionsToDocument = function(playerValues) {
+    const addPlayerSkillFunctionsToDocument = function(playerValues) {
         document.countPlayerSkills = countPlayerSkills;
         document.toogleRosterStats = toggleRosterStats;
         document.playerValues = playerValues;
     };
 
-    var selectPlayerRow = function(row, rosterRows) {
+    const selectPlayerRow = function(row, rosterRows) {
         if(!row.style.backgroundColor || row.style.backgroundColor !== SELECTED_PLAYER_COLOR) {
             row.oldBackgroundColor = row.style.backgroundColor;
             row.style.backgroundColor = SELECTED_PLAYER_COLOR;
@@ -626,8 +618,8 @@
         } else {
             row.style.backgroundColor = null;
         }
-        var selectedPlayers = rosterRows.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
-        var selectedPlayersCount = selectedPlayers.length;
+        const selectedPlayers = rosterRows.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
+        const selectedPlayersCount = selectedPlayers.length;
         document.selectedPlayers = selectedPlayers;
         console.log(selectedPlayers);
         console.log("Clicked row");
@@ -640,7 +632,7 @@
         }
     };
 
-    var makeRosterRowsClickable = function(rosterRows) {
+    const makeRosterRowsClickable = function(rosterRows) {
         rosterRows.forEach((player) => {
             let row = player.theRow;
             row.style.cursor = "crosshair";
@@ -653,7 +645,7 @@
     addDropdownSearch("m0team2");
 
     if( document.URL.indexOf("default.asp?p=ro") > 0 ) {
-        const roster = document.querySelector(".tblist");
+        //const roster = document.querySelector(".tblist");
         const players = [...document.querySelectorAll(".tblist tr")].filter((row) => {return row.classList.contains("trlist");});
         const playerValues = players.map((row) => parsePlayer(row));
 
@@ -668,7 +660,7 @@
     }
 
     //Remove javascript log out
-    var timer_id = window.setTimeout(function() {}, 0);
+    let timer_id = window.setTimeout(function() {}, 0);
     while (timer_id--) {
         window.clearTimeout(timer_id); // will do nothing if no timeout with id is present
     }
