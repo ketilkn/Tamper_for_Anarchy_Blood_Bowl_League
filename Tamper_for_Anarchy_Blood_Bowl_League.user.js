@@ -504,12 +504,14 @@
         sumRow.id="selectedPlayers";
         sumRow.children[0].innerText="sel";
         sumRow.className = "trlist sums selectionSums";
+        sumRow.style.backgroundColor = SELECTED_PLAYER_COLOR;
         return sumRow;
     };
 
     const addRosterSumsReady = function(players) {
         const totalSumRow = addRosterSums(players);
         totalSumRow.className = "trlist sums totalSums";
+        totalSumRow.children[2].title = "Click to select/unselect all";
 
         totalSumRow.children[2].onclick = function() {
             let selectedPlayers = players.filter((player) => player.theRow.style.backgroundColor && player.theRow.style.backgroundColor == SELECTED_PLAYER_COLOR);
@@ -520,7 +522,6 @@
             }
 
         };
-        //totalSumRow.children[2].innerText="aaa";
         return totalSumRow;
     };
 
