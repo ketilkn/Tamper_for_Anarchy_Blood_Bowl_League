@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tamper for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.23
+// @version      0.24
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -41,12 +41,13 @@
 // 0.20: Added MNG row and made rows selectable in the team roster
 // 0.22: Fix bug in team roster select all/none toggle
 // 0.23: Team roster has separate row for selected players + bugfixes
+// 0.24: Highlight team roster skills by hovering or clicking
 
 (function() {
+    'use strict';
     const SELECTED_PLAYER_COLOR = "lightblue";
     const SELECTED_SKILL_BGCOLOR = "lightgreen";
     const HOVER_SKILL_BGCOLOR = "yellow";
-    'use strict';
 
     //From: https://gist.github.com/niyazpk/f8ac616f181f6042d1e0
     // Add / Update a key-value pair in the URL query parameters
