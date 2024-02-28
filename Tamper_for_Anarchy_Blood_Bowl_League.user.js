@@ -50,12 +50,12 @@
     // Add / Update a key-value pair in the URL query parameters
     function updateUrlParameter(uri, key, value) {
         // remove the hash part before operating on the uri
-        var i = uri.indexOf('#');
-        var hash = i === -1 ? '' : uri.substr(i);
+        let i = uri.indexOf('#');
+        const hash = i === -1 ? '' : uri.substr(i);
         uri = i === -1 ? uri : uri.substr(0, i);
 
-        var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
-        var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+        let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+        let separator = uri.indexOf('?') !== -1 ? "&" : "?";
         if (uri.match(re)) {
             uri = uri.replace(re, '$1' + key + "=" + value + '$2');
         } else {
@@ -74,14 +74,15 @@
     return defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
   } else if (el.currentStyle) { // IE
     // sanitize property name to camelCase
-    styleProp = styleProp.replace(/\-(\w)/g, function(str, letter) {
+    styleProp = styleProp.replace(/-(\w)/g, function(str, letter) {
       return letter.toUpperCase();
     });
     value = el.currentStyle[styleProp];
     // convert other units to pixels on IE
     if (/^\d+(em|pt|%|ex)?$/i.test(value)) {
       return (function(value) {
-        var oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
+        let oldLeft = el.style.left;
+        let oldRsLeft = el.runtimeStyle.left;
         el.runtimeStyle.left = el.currentStyle.left;
         el.style.left = value || 0;
         value = el.style.pixelLeft + "px";
@@ -97,40 +98,37 @@
     function hasClass( target, className ) {
         return new RegExp('(\\s|^)' + className + '(\\s|$)').test(target.className);
     }
-    var heartbeat = function (){
+    const heartbeat = function (){
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", "http://www.anarchy.bloodbowlleague.com/default.asp?p=adm", false );
         xmlHttp.send( null );
     };
 
-    var wrapAnchor = function(el, link, title) {
-        var tooltip = "";
+    const wrapAnchor = function(el, link, title) {
+        let tooltip = "";
         if( title && title.length > 0 ) {
             tooltip = title;
         }
 
-        var text = el.innerHTML;
+        let text = el.innerHTML;
         el.innerHTML = "<a class='player-link' style='text-decoration: none; cursor: pointer;' href='"+link+"' title='"+tooltip+"'>"+text+"</a>";
         return el;
     };
 
-    var extractLink = function(el) {
+    const extractLink = function(el) {
         if (! el ) {
             return "#feilExtractLink";
         }
-        return el.onclick.toString().match(/\'.*.*\'/g).toString().slice(1,-1);
-
-
+        return el.onclick.toString().match(/'.*.*'/g).toString().slice(1,-1);
     };
 
-    var isPlayerTemporaryRetired = function(el) {
+    const isPlayerTemporaryRetired = function(el) {
         const columns = el.children;
         return columns[11].querySelector('img') && columns[11].querySelector('img').src.endsWith("retire.png");
 
     };
 
     const isPlayerMng = function(el) {
-        const columns = el.children;
         return el.children[9].innerText === "M"; // && !isPlayerTemporaryRetired(el);
     };
 
@@ -158,7 +156,6 @@
     const getPlayerSkillsImprovements = function(row) {
         const extraSkills = [...row.children[8].childNodes].slice(1)
         return extraSkills.filter((r) => r.textContent.indexOf(",")==-1).map((s) => s.innerText.trim().split("(")[0]).filter((r) => r!="?");
-        return [...row.children[8].childNodes[1].children].map((s) => s.innerText.trim()).filter((r) => r === "?").length > 0;
 
     };
 
@@ -256,15 +253,15 @@
         const onclick = td.getAttribute("onclick").toString();
         if(onclick.indexOf("gototeam") > -1 ) {
             if( (td.style.color=="rgb(32, 48, 64)" || td.style.color=="rgb(96, 96, 96)")) {
-                var teamId = extractLink(td);
-                var innerHtml = td.innerHTML;
+                let teamId = extractLink(td);
+                let innerHtml = td.innerHTML;
                 td.innerHTML = "";
-                var a = document.createElement("a");
+                let a = document.createElement("a");
 
                 td.appendChild(a);
 
-                var tooltip ="open team info";
-                var whereTo = "tm";
+                let tooltip ="open team info";
+                let whereTo = "tm";
                 if(hasClass(td,"td10")) {
                     whereTo = "ro";
                     tooltip = "open roster";
@@ -286,10 +283,10 @@
     };
 
     const processTrOnClick = function(el) {
-        var link = extractLink(el);
-        var td = el.querySelectorAll("td");
+        let link = extractLink(el);
+        let td = el.querySelectorAll("td");
 
-        for(var j = 0; j < td.length; j++) {
+        for(let j = 0; j < td.length; j++) {
             wrapAnchor(td[j], link);
             wrapAnchor(td[j], link);
 
@@ -302,7 +299,7 @@
     };
 
     const addLinkToParent = function(el, linkText) {
-        var a = document.createElement("a");
+        let a = document.createElement("a");
         a.innerText=linkText;
         a.href = el.href;
         el.parentNode.appendChild(a);
@@ -311,20 +308,20 @@
 
     const processMenuTd = function(el) {
         //alert(el.getAttribute("onclick"));
-        var link = extractLink(el);
+        let link = extractLink(el);
         //alert(link);
         wrapAnchor(el, link);
         el.setAttribute("onclick", "");
 
         const leagueLink = el.querySelector('a');
         if(el.querySelector('a').href.indexOf('&s=') >= 0){
-            var matchLink = addLinkToParent(leagueLink, '[m]');
+            let matchLink = addLinkToParent(leagueLink, '[m]');
             matchLink.href = updateUrlParameter(matchLink.href, 'p', 'ma');
             matchLink.href = updateUrlParameter(matchLink.href, 'so', 's');
             matchLink.title = 'Show matches';
 
             if(leagueLink.innerText.indexOf('Semi Pro') == 0) {
-                var newLink = addLinkToParent(leagueLink, '[+]');
+                let newLink = addLinkToParent(leagueLink, '[+]');
                 newLink.href = updateUrlParameter(newLink.href, 'p', 'am');
                 newLink.title = 'Create matches';
             }
@@ -333,7 +330,7 @@
 
     // CONVERT onclicks to link
     const tr_onclicks = document.querySelectorAll("tr[onclick]");
-    for(var i = 0; i < tr_onclicks.length; i++) {
+    for(let i = 0; i < tr_onclicks.length; i++) {
         if(tr_onclicks[i].classList.contains('trlist')) {
             continue;
         }
@@ -358,7 +355,7 @@
 
     const applyDropdownFilter = function (element) {
         element.dropdown.innerHTML = "";
-        for(var j = 0; j < element.options.length; j++) {
+        for(let j = 0; j < element.options.length; j++) {
             //console.log(this.options[j].name);
             if((element.value.length == 0) || element.options[j].name.search(new RegExp(element.value,"i")) >=0) {
                 var foo = document.createElement("option");
@@ -372,26 +369,22 @@
     };
 
     const updateDropdown = function(event) {
-        if(event.keyCode == 38 ) {
+        if(event.keyCode === 38 ) {
             //up
-            var index = this.dropdown.selectedIndex;
+            let index = this.dropdown.selectedIndex;
             if(index > 0 ) {
                 this.dropdown.selectedIndex = index -1;
             }
 
-        }else if (event.keyCode == 40 ) {
+        }else if (event.keyCode === 40 ) {
             //down
-            var idx = this.dropdown.selectedIndex;
+            const idx = this.dropdown.selectedIndex;
             if(idx < this.dropdown.length -1 ) {
                 this.dropdown.selectedIndex =idx +1;
             }
-
-
-
         }else {
             applyDropdownFilter(this);
         }
-
     };
 
     const updateRosterSums = function (players, sums, sumAllPlayers) {
@@ -450,7 +443,6 @@
         //sumRow.innerHTML = playerRowHtml;
         //sumRow.className = "trlist sums";
 
-
         sumRow.children[0].align="center";
         sumRow.children[1].innerText="";
         sumRow.children[2].innerText= sumLabel;
@@ -483,7 +475,7 @@
         borderRow.parentNode.insertBefore(sumRow, borderRow);
     };
 
-    var addRosterSums = function(players, sumAllPlayers) {
+    const addRosterSums = function(players, sumAllPlayers) {
         let selectionSums = document.querySelector('tr.selectionSums');
         if (selectionSums) {
             return selectionSums;
@@ -617,7 +609,7 @@
             row.children[12].style.display="table-cell";
             row.children[13].style.display="table-cell";
             row.children[14].style.display="table-cell";
-            if(!row.classList.contains(".trlist") && row.children.length == 17) {
+            if(!row.classList.contains(".trlist") && row.children.length === 17) {
                 let missing1 = document.createElement("td");
                 missing1.className = row.children[14].className;
                 missing1.style = row.children[14].style.cssText;
