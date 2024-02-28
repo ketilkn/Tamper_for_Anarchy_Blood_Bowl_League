@@ -123,7 +123,7 @@
     }
 
     const addClassToSkills = function (playerRow) {
-        const extraSkills = [...playerRow.children[8].childNodes];
+        const extraSkills = [...playerRow.children[8].querySelectorAll('span')];
         extraSkills.forEach(skill => {
             if(skill.textContent.trim() === '?') {
                 skill.className = "skill-available";
@@ -131,6 +131,7 @@
                 let skillClass = skillNameToClass(skill.textContent);
                 let improvementType = skill.style && skill.style.color ? "skill-improvement" : "skill-basic";
                 skill.className = "skill " + improvementType + " " + skillClass;
+                skill.dataset.skill = skillClass;
             }
         });
     }
@@ -139,13 +140,24 @@
         let skills = playerRow.children[8].firstChild.textContent.split(',').filter((s => s.trim().length > 0));
         let skillText = playerRow.children[8].firstChild;
 
+        //Make sure that the first child is not already inside a span
+        if(playerRow.children[8].firstChild.tagName && playerRow.children[8].firstChild.tagName === "SPAN") {
+            return;
+        }
+
         skills.forEach(skill => {
             let skillSpan = document.createElement('span');
             skillSpan.textContent = skill;
 
             skillText.parentNode.insertBefore(skillSpan, skillText);
-            skillText.parentNode.insertBefore(document.createTextNode(","), skillText);
+            if(skillSpan.previousSibling && skillSpan.previousSibling.textContent.trim() != ",") {
+                skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan);
+            }
+            if(skillSpan.nextSibling && skillSpan.nextSibling.textContent.trim() != ",") {
+                skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan.nextSibling);
+            }
         });
+
         skillText.remove();
     }
 
