@@ -115,6 +115,40 @@
         return el;
     };
 
+    const skillNameToClass = function (skill) {
+        if(skill.trim().startsWith('+')) {
+            return "extra-"+skill.trim().toLowerCase().slice(1);
+        }
+        return skill.trim().replace(/\(.*\)/g,'').trim().replace(/\s/g, '-').toLowerCase().trim()
+    }
+
+    const addClassToSkills = function (playerRow) {
+        const extraSkills = [...playerRow.children[8].childNodes];
+        extraSkills.forEach(skill => {
+            if(skill.textContent.trim() === '?') {
+                skill.className = "skill-available";
+            } else {
+                let skillClass = skillNameToClass(skill.textContent);
+                let improvementType = skill.style && skill.style.color ? "skill-improvement" : "skill-basic";
+                skill.className = "skill " + improvementType + " " + skillClass;
+            }
+        });
+    }
+
+    const skillBasicToSpan = function(playerRow) {
+        let skills = playerRow.children[8].firstChild.textContent.split(',').filter((s => s.trim().length > 0));
+        let skillText = playerRow.children[8].firstChild;
+
+        skills.forEach(skill => {
+            let skillSpan = document.createElement('span');
+            skillSpan.textContent = skill;
+
+            skillText.parentNode.insertBefore(skillSpan, skillText);
+            skillText.parentNode.insertBefore(document.createTextNode(","), skillText);
+        });
+        skillText.remove();
+    }
+
     const extractLink = function(el) {
         if (! el ) {
             return "#feilExtractLink";
@@ -691,6 +725,11 @@
         reformatMngPlayers(playerValues);
         toggleRosterStats();
 
+        playerValues.forEach(player => {
+            skillBasicToSpan(player.theRow);
+            addClassToSkills(player.theRow);
+        });
+
         document.getPlayerSkillsExtra = getPlayerSkillsExtra;
 
     } else {
@@ -705,5 +744,4 @@
 
     //Keep alive
     window.setInterval(heartbeat, 600000);
-
 })();
