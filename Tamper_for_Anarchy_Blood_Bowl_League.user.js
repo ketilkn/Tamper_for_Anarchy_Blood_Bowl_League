@@ -44,6 +44,8 @@
 
 (function() {
     const SELECTED_PLAYER_COLOR = "lightblue";
+    const SELECTED_SKILL_BGCOLOR = "lightgreen";
+    const HOVER_SKILL_BGCOLOR = "yellow";
     'use strict';
 
     //From: https://gist.github.com/niyazpk/f8ac616f181f6042d1e0
@@ -740,8 +742,45 @@
         playerValues.forEach(player => {
             skillBasicToSpan(player.theRow);
             addClassToSkills(player.theRow);
+            player.theRow.children[8].onclick = function(ev) {ev.stopPropagation(); return false};
+            document.querySelectorAll('span.skill').forEach(skillSpan => {
+               skillSpan.onclick = function(ev) {
+                   let el = ev.target;
+                    if(el.classList.contains('selected')) {
+                        //console.log(`Unselected ${el.dataset.skill}`);
+                        let selector = "span."+el.dataset.skill;
+                        document.querySelectorAll(selector).forEach(span => {
+                            span.classList.remove('selected');
+                        });
+                    } else {
+                        //console.log(`Selected ${el.dataset.skill}`);
+                        let selector = "span."+el.dataset.skill;
+                        document.querySelectorAll(selector).forEach(span => {
+                            span.classList.add('selected');
+                        });
+                    }
+                    ev.stopPropagation();
+                    return false;
+                };
+                skillSpan.onmouseout = function(ev) {
+                    let selector = "span."+ev.target.dataset.skill;
+                    document.querySelectorAll(selector).forEach(span => {
+                        span.classList.remove('over');
+                    });
+                };
+                skillSpan.onmouseover = function(ev) {
+                    let el = ev.target;
+                    let selector = "span."+el.dataset.skill;
+                    document.querySelectorAll(selector).forEach(span => {
+                        span.classList.add('over');
+                    });
+                };
+            });
         });
-
+        document.styleSheets[0].insertRule(`span.selected.skill {background-color: ${SELECTED_SKILL_BGCOLOR};}`);
+        document.styleSheets[0].insertRule(`span.skill.over {background-color: ${HOVER_SKILL_BGCOLOR};}`);
+        document.styleSheets[0].insertRule("span.skill:hover {cursor: copy;}");
+        document.styleSheets[0].insertRule("span.skill {word-break: normal; overflow-wrap: normal; white-space:nowrap;}");
         document.getPlayerSkillsExtra = getPlayerSkillsExtra;
 
     } else {
