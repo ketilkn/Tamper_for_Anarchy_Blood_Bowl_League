@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tamper for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.27
+// @version      0.28
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -45,6 +45,7 @@
 // 0.25: Fix bug where same skills would be counted as different skills
 // 0.26: Use new GitHub raw URLs
 // 0.27: Remove trailing comma from basic skills when it is the last node
+// 0.28: Tamper Monkey update test
 
 (function() {
     'use strict';
@@ -798,4 +799,5 @@
     //Keep alive
     window.setInterval(heartbeat, 600000);
     console.log('Finished loading tamper for Anarchy Blood Bowl League');
+    alert('updated!');
 })();
