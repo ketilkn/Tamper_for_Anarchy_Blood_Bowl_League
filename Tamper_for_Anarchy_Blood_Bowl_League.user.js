@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tamper for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.29
+// @version      0.30
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -47,6 +47,7 @@
 // 0.27: Remove trailing comma from basic skills when it is the last node
 // 0.28: Tamper Monkey update test
 // 0.29: Fixed meta file case issue
+// 0.30: Fix missing comma for basic skills bug
 
 (function() {
     'use strict';
@@ -147,6 +148,7 @@
     const skillBasicToSpan = function(playerRow) {
         let skills = playerRow.children[8].firstChild.textContent.split(',').map(e => e.trim()).filter((s => s.trim().length > 0));
         let skillText = playerRow.children[8].firstChild;
+        let skillColumn = skillText.parentNode;
         let targetNode = skillText.nextSibling;
 
         //Make sure that the first child is not already inside a span
@@ -159,8 +161,11 @@
             let skillSpan = document.createElement('span');
             skillSpan.textContent = skill;
 
-            skillText.parentNode.insertBefore(skillSpan, targetNode);
-            if(skillSpan.nextSibling  && skillSpan.nextSibling.textContent.trim() !== ",") {
+            skillColumn.insertBefore(skillSpan, targetNode);
+            if(skillSpan.previousSibling && skillSpan.previousSibling.textContent.trim() !== ",") {
+                skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan);
+            }
+            if(skillSpan.nextSibling  /*&& skillSpan.nextSibling.textContent.trim() !== ","*/) {
                 skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan.nextSibling);
             }
         });
