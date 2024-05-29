@@ -44,6 +44,7 @@
 // 0.24: Highlight team roster skills by hovering or clicking
 // 0.25: Fix bug where same skills would be counted as different skills
 // 0.26: Use new GitHub raw URLs
+// 0.27: Remove trailing comma from basic skills when it is the last node
 
 (function() {
     'use strict';
@@ -142,28 +143,26 @@
     }
 
     const skillBasicToSpan = function(playerRow) {
-        let skills = playerRow.children[8].firstChild.textContent.split(',').filter((s => s.trim().length > 0));
+        let skills = playerRow.children[8].firstChild.textContent.split(',').map(e => e.trim()).filter((s => s.trim().length > 0));
         let skillText = playerRow.children[8].firstChild;
+        let targetNode = skillText.nextSibling;
 
         //Make sure that the first child is not already inside a span
         if(playerRow.children[8].firstChild.tagName && playerRow.children[8].firstChild.tagName === "SPAN") {
             return;
         }
+        skillText.remove();
 
         skills.forEach(skill => {
             let skillSpan = document.createElement('span');
             skillSpan.textContent = skill;
 
-            skillText.parentNode.insertBefore(skillSpan, skillText);
-            if(skillSpan.previousSibling && skillSpan.previousSibling.textContent.trim() != ",") {
-                skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan);
-            }
-            if(skillSpan.nextSibling && skillSpan.nextSibling.textContent.trim() != ",") {
+            skillText.parentNode.insertBefore(skillSpan, targetNode);
+            if(skillSpan.nextSibling  && skillSpan.nextSibling.textContent.trim() !== ",") {
                 skillSpan.parentNode.insertBefore(document.createTextNode(", "), skillSpan.nextSibling);
             }
         });
 
-        skillText.remove();
     }
 
     const extractLink = function(el) {
