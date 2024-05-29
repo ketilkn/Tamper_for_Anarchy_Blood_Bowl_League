@@ -15,9 +15,12 @@ if( $_GET['p'] && $_GET['p'] == 'ro') {
         load_with_script_tag('cri.html');
     }else if ($_GET['t'] == 'ank') {
              load_with_script_tag('ank.html');
-    }else if ($_GET['t'] == 'mot') {
-            load_with_script_tag('mot.html');
-        }
+    }else if ($_GET['t'] == 'fin') {
+        load_with_script_tag('fin.html');
+    }
+    else if ($_GET['t'] == 'mot') {
+        load_with_script_tag('mot.html');
+    }
 }else if ($_GET['p'] && $_GET['p'] == 'ans') {
     load_with_script_tag('purchase.html');
 }else {
