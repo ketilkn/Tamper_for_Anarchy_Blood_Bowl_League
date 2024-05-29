@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tamper for Anarchy Blood Bowl League
 // @namespace    http://www.anarchy.bloodbowlleague.net/
-// @version      0.28
+// @version      0.29
 // @description  Convert onclick to anchor for bloodbowlleague.net
 // @license      MIT
 // @copyright 2024, ketilkn (https://openuserjs.org/users/ketilkn)
@@ -15,7 +15,7 @@
 // @match        http://www.*.bbleague.net/*
 // @match        http://*.bbleague.net/*
 // @grant        none
-// @updateURL    https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/Tamper_for_Anarchy_Blood_bowl_League.meta.js
+// @updateURL    https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/Tamper_for_Anarchy_Blood_Bowl_League.meta.js
 // @downloadURL  https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/Tamper_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
@@ -46,6 +46,7 @@
 // 0.26: Use new GitHub raw URLs
 // 0.27: Remove trailing comma from basic skills when it is the last node
 // 0.28: Tamper Monkey update test
+// 0.29: Fixed meta file case issue
 
 (function() {
     'use strict';
@@ -799,5 +800,4 @@
     //Keep alive
     window.setInterval(heartbeat, 600000);
     console.log('Finished loading tamper for Anarchy Blood Bowl League');
-    alert('updated!');
 })();
