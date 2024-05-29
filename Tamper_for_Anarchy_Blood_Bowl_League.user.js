@@ -15,8 +15,8 @@
 // @match        http://www.*.bbleague.net/*
 // @match        http://*.bbleague.net/*
 // @grant        none
-// @updateURL    https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Tamper_for_Anarchy_Blood_Bowl_League.meta.js
-// @downloadURL  https://github.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/raw/master/Tamper_for_Anarchy_Blood_Bowl_League.user.js
+// @updateURL    https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/Tamper_for_Anarchy_Blood_bowl_League.meta.js
+// @downloadURL  https://raw.githubusercontent.com/ketilkn/Tamper_for_Anarchy_Blood_Bowl_League/master/Tamper_for_Anarchy_Blood_Bowl_League.user.js
 // ==/UserScript==
 
 // 0.1: Initial version. Replace onclick player, match with anchor. Remove timeout and add keep alive
@@ -42,6 +42,8 @@
 // 0.22: Fix bug in team roster select all/none toggle
 // 0.23: Team roster has separate row for selected players + bugfixes
 // 0.24: Highlight team roster skills by hovering or clicking
+// 0.25: Fix bug where same skills would be counted as different skills
+// 0.26: Use new GitHub raw URLs
 
 (function() {
     'use strict';
@@ -796,4 +798,5 @@
 
     //Keep alive
     window.setInterval(heartbeat, 600000);
+    console.log('Finished loading tamper for Anarchy Blood Bowl League');
 })();
