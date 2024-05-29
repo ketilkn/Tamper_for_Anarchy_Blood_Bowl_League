@@ -13,6 +13,8 @@ if( $_GET['p'] && $_GET['p'] == 'ro') {
         load_with_script_tag('loei.html');
     }else if ($_GET['t'] == 'cri') {
         load_with_script_tag('cri.html');
+    }else if ($_GET['t'] == 'ank') {
+             load_with_script_tag('ank.html');
     }else if ($_GET['t'] == 'mot') {
             load_with_script_tag('mot.html');
         }

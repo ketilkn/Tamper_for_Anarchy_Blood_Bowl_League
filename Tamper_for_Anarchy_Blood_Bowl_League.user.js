@@ -198,7 +198,7 @@
 
     const getPlayerSkillsExtra = function(row) {
         const extraSkills = [...row.children[8].children];
-        return extraSkills.map((s) => s.textContent).filter((s) =>
+        return extraSkills.map((s) => s.textContent.trim()).filter((s) =>
             s.trim() !== "," && s.trim() !== "?");
 
     };
